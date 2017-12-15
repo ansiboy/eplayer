@@ -52,10 +52,6 @@ import java.lang.reflect.Method;
 import java.util.Timer;
 import java.util.TimerTask;
 
-//enum ErrorSounds {
-//    Success = 1,
-//}
-
 
 public class MainActivity extends CordovaActivity {
 
@@ -65,7 +61,6 @@ public class MainActivity extends CordovaActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        //this.setWifi();
 
         super.onCreate(savedInstanceState);
 
@@ -75,14 +70,14 @@ public class MainActivity extends CordovaActivity {
             moveTaskToBack(true);
         }
 
+        // Set by <content src="index.html" /> in config.xml
+        loadUrl(launchUrl);
 
-        //=======================================================================================
-        // 调节最大音量
-        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, AudioManager.FLAG_SHOW_UI);
-        //=======================================================================================
 
+        // 音量最大化
+        setMaxVolume();
+
+        // 设置网络
         if (!isNetworkAvailable()) {
             JSONObject config = scandWifiConfig();
             if (config == null) {
@@ -108,8 +103,7 @@ public class MainActivity extends CordovaActivity {
 
         this.playSound(SOUND_SUCCESS);
 
-        // Set by <content src="index.html" /> in config.xml
-        loadUrl(launchUrl);
+
 
         //=========================================
         // 定时重启
@@ -128,6 +122,18 @@ public class MainActivity extends CordovaActivity {
         //=========================================
     }
 
+    /**
+     * 将音量最大化
+     */
+    void setMaxVolume() {
+        //=======================================================================================
+        // 调节最大音量
+        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, AudioManager.FLAG_SHOW_UI);
+        //=======================================================================================
+    }
+
     JSONObject scandWifiConfig() {
         StorageManager storageManager = (StorageManager) this.getSystemService(Context.STORAGE_SERVICE);
 
@@ -140,13 +146,11 @@ public class MainActivity extends CordovaActivity {
             if (invokes == null)
                 return null;
 
-            StorageInfo info = null;
             for (int i = 0; i < invokes.length; i++) {
                 Object obj = invokes[i];
-                Method getPath = obj.getClass().getMethod("getPath", new Class[0]);
-                String path = (String) getPath.invoke(obj, new Object[0]);
-                info = new StorageInfo(path);
-                File file = new File(info.path);
+                Method getPath = obj.getClass().getMethod("getPath");
+                String path = (String) getPath.invoke(obj);
+                File file = new File(path);
                 boolean canRead = file.canRead();
                 if (file.exists() && file.isDirectory() && canRead) {
 
@@ -246,7 +250,7 @@ public class MainActivity extends CordovaActivity {
                     os.close();
                 }
                 process.destroy();
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
         Log.d("*** DEBUG ***", "Root SUC ");
@@ -258,27 +262,17 @@ public class MainActivity extends CordovaActivity {
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo info = cm.getActiveNetworkInfo();
-        if (info != null && info.isConnected()) {
-            return true;
-        }
-
-        return false;
-
+        return info != null && info.isConnected();
     }
 
     private boolean setWifi(String ssid, String password) {
         WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
-        //        wm.enableNetwork()
+
         if (!wm.isWifiEnabled()) {
             wm.setWifiEnabled(true);
         }
 
-//        WifiInfo wifiInfo = wm.getConnectionInfo();
         WifiConfiguration wifiConfig = new WifiConfiguration();
-
-//        String ssid = "ChinaNet-mm";
-//        String password = "8126381263";
-
         wifiConfig.SSID = "\"" + ssid + "\"";
         wifiConfig.preSharedKey = "\"" + password + "\"";
         wifiConfig.hiddenSSID = true;
