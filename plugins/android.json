@@ -14,6 +14,12 @@
             "XWALK_MODE": "embedded",
             "XWALK_MULTIPLEAPK": "true",
             "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-hot-code-push-plugin": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-hot-code-push-local-dev-addon": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
         }
     },
     "dependent_plugins": {}

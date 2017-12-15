@@ -40,6 +40,7 @@ import android.os.PowerManager;
 import android.os.storage.StorageManager;
 import android.media.AudioManager;
 import android.util.Log;
+import android.view.WindowManager;
 
 
 import java.io.BufferedReader;
@@ -58,6 +59,7 @@ public class MainActivity extends CordovaActivity {
     private int SOUND_SUCCESS = 1;
     private int SOUND_NETWORK_ERROR = 2;
     private int SOUND_CONFIG_ERROR = 3;
+    private PowerManager.WakeLock wakeLock;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,9 @@ public class MainActivity extends CordovaActivity {
         // Set by <content src="index.html" /> in config.xml
         loadUrl(launchUrl);
 
+
+        //应用运行时，保持屏幕高亮，不锁屏
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         // 音量最大化
         setMaxVolume();
@@ -291,6 +296,23 @@ public class MainActivity extends CordovaActivity {
 
         return b;
     }
+
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        wakeLock = ((PowerManager) getSystemService(POWER_SERVICE))
+//                .newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
+//                        | PowerManager.ON_AFTER_RELEASE, TAG);
+//        wakeLock.acquire();
+//    }
+//
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        if (wakeLock != null) {
+//            wakeLock.release();
+//        }
+//    }
 }
 
 
