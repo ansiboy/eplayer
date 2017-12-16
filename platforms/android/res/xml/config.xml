@@ -25,7 +25,7 @@
     <allow-intent href="geo:*" />
     <allow-intent href="market:*" />
     <chcp>
-        <config-file url="http://192.168.1.7:31284/chcp.json" />
+        <config-file url="http://localhost:31284/chcp.json" />
         <local-development enabled="true" />
     </chcp>
     <preference name="loglevel" value="DEBUG" />

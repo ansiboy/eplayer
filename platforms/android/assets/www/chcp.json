@@ -1,4 +1,4 @@
 {
-  "content_url": "http://192.168.1.7:31284/",
+  "content_url": "http://localhost:31284/",
   "update": "now"
 }
