@@ -24,6 +24,7 @@
         <allow-intent href="itms-apps:*" />
     </platform>
     <chcp>
-        <config-file url="https://a303a92d.ngrok.io/chcp.json"/>
+        <config-file url="https://a303a92d.ngrok.io/chcp.json" />
     </chcp>
+    <plugin name="cordova-plugin-file" spec="~4.3.3" />
 </widget>
