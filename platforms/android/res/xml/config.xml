@@ -43,6 +43,6 @@
   <preference name="loadUrlTimeoutValue" value="60000"/>
   <chcp>
     <local-development enabled="true"/>
-    <config-file url="https://5ea7db26.ngrok.io/chcp.json"/>
+    <config-file url="https://1a3e2ad2.ngrok.io/chcp.json"/>
   </chcp>
 </widget>

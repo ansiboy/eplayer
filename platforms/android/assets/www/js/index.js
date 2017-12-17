@@ -3,30 +3,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+        step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
-let service = new Service();
-class Application {
-    start() {
-        document.addEventListener('deviceready', () => this.on_deviceready(), false);
+class MusicPlayer {
+    constructor(musicDirectory) {
+        this.musicDirectory = musicDirectory;
+        console.assert(this.musicDirectory != null);
+        window.setTimeout(() => {
+            this.start();
+        }, 1000 * 10);
     }
-    on_deviceready() {
+    start() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.musicDirectory = cordova.file.dataDirectory;
-            console.assert(this.musicDirectory != null);
             yield this.updatePlayLists();
             this.play();
+            this.downloadScheduleMusic(MusicPlayer.playlists);
             let second = 1000;
             let minute = second * 60;
             setInterval(() => __awaiter(this, void 0, void 0, function* () {
                 yield this.updatePlayLists();
+                this.downloadScheduleMusic(MusicPlayer.playlists);
             }), minute * 30);
         });
     }
     play() {
         return __awaiter(this, void 0, void 0, function* () {
-            let lists = Application.playlists; //await this.getPlaySchedule();
+            let lists = MusicPlayer.playlists; //await this.getPlaySchedule();
             console.assert(lists != null);
             //========================================================
             // 如果没有播放列表，延时 60 秒，再尝试播放
@@ -37,8 +40,10 @@ class Application {
             //========================================================
             for (let list of lists) {
                 let online_time = this.parseTime(list.online_time);
-                if (online_time > new Date(Date.now())) {
-                    this.playList(lists[0], () => this.play());
+                let offline_time = this.parseTime(list.offline_time);
+                let now = new Date(Date.now());
+                if (now >= online_time && now < offline_time) {
+                    this.playList(list, () => this.play());
                 }
             }
         });
@@ -76,7 +81,7 @@ class Application {
                 playMusic(next);
             });
         };
-        function nextMusic(current) {
+        let nextMusic = (current) => {
             // 如果列表为随机播放，则随机取一首音乐，并且不等于当前播放的音乐
             if (list.type == PlayRadomType) {
                 let r;
@@ -89,7 +94,7 @@ class Application {
             if (num > list.music_list.length - 1)
                 num = 0;
             return num;
-        }
+        };
         playMusic(0);
     }
     random(min, max) {
@@ -99,7 +104,7 @@ class Application {
         return __awaiter(this, void 0, void 0, function* () {
             let file = yield this.musicLocalFile(music);
             let fileExists = file != null;
-            let src = file != null ? file.fullPath : music.path;
+            let src = file != null ? file.nativeURL : music.path;
             let media = new Media(src, () => {
             }, err => {
                 if (file != null) {
@@ -177,15 +182,15 @@ class Application {
     updatePlayLists() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
+                let service = new Service();
                 let result = yield service.playSchedule();
                 if (result.code == CodeSuccess)
-                    Application.playlists = result.data.playlist;
+                    MusicPlayer.playlists = result.data.playlist;
                 else
-                    Application.playlists = [];
-                this.downloadScheduleMusic(Application.playlists);
+                    MusicPlayer.playlists = [];
             }
             finally {
-                return Application.playlists;
+                return MusicPlayer.playlists;
             }
         });
     }
@@ -208,6 +213,21 @@ class Application {
         });
     }
 }
-Application.playlists = new Array();
+MusicPlayer.playlists = new Array();
+class MusicPage {
+}
+class Application {
+    constructor() {
+        document.addEventListener('deviceready', () => this.on_deviceready(), false);
+    }
+    on_deviceready() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let musicDirectory = cordova.file.dataDirectory;
+            let player = new MusicPlayer(musicDirectory);
+        });
+    }
+    start() {
+    }
+}
 let app = new Application();
 app.start();

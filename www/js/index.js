@@ -3,14 +3,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+        step((generator = generator.apply(thisArg, _arguments)).next());
     });
 };
 class MusicPlayer {
     constructor(musicDirectory) {
         this.musicDirectory = musicDirectory;
         console.assert(this.musicDirectory != null);
-        this.start();
+        window.setTimeout(() => {
+            this.start();
+        }, 1000 * 10);
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -38,8 +40,10 @@ class MusicPlayer {
             //========================================================
             for (let list of lists) {
                 let online_time = this.parseTime(list.online_time);
-                if (online_time > new Date(Date.now())) {
-                    this.playList(lists[0], () => this.play());
+                let offline_time = this.parseTime(list.offline_time);
+                let now = new Date(Date.now());
+                if (now >= online_time && now < offline_time) {
+                    this.playList(list, () => this.play());
                 }
             }
         });
@@ -91,7 +95,8 @@ class MusicPlayer {
                 num = 0;
             return num;
         };
-        playMusic(0);
+        let num = nextMusic(-1);
+        playMusic(num);
     }
     random(min, max) {
         return Math.floor(min + Math.random() * (max - min));
@@ -100,13 +105,16 @@ class MusicPlayer {
         return __awaiter(this, void 0, void 0, function* () {
             let file = yield this.musicLocalFile(music);
             let fileExists = file != null;
-            let src = file != null ? file.fullPath : music.path;
+            let src = file != null ? file.nativeURL : music.path;
             let media = new Media(src, () => {
             }, err => {
                 if (file != null) {
                     file.remove(() => { });
                 }
-                finish();
+                //=======================================
+                // 延时 2 秒，以防出现死循环
+                setTimeout(() => finish(), 1000 * 2);
+                //=======================================
             }, (status) => {
                 if (status == Media.MEDIA_STOPPED) {
                     finish();

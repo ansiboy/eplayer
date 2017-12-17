@@ -7,7 +7,9 @@ class MusicPlayer {
         this.musicDirectory = musicDirectory;
         console.assert(this.musicDirectory != null);
 
-        this.start();
+        window.setTimeout(() => {
+            this.start();
+        }, 1000 * 10);
     }
 
     private async start() {
@@ -37,8 +39,10 @@ class MusicPlayer {
 
         for (let list of lists) {
             let online_time = this.parseTime(list.online_time);
-            if (online_time > new Date(Date.now())) {
-                this.playList(lists[0], () => this.play());
+            let offline_time = this.parseTime(list.offline_time);
+            let now = new Date(Date.now());
+            if (now >= online_time && now < offline_time) {
+                this.playList(list, () => this.play());
             }
         }
     }
@@ -100,7 +104,8 @@ class MusicPlayer {
             return num;
         }
 
-        playMusic(0);
+        let num = nextMusic(-1);
+        playMusic(num);
     }
 
     private random(min, max) {
@@ -112,7 +117,7 @@ class MusicPlayer {
         let file = await this.musicLocalFile(music);
         let fileExists = file != null;
 
-        let src = file != null ? file.fullPath : music.path;
+        let src = file != null ? file.nativeURL : music.path;
         let media = new Media(src,
             () => {
 
@@ -121,7 +126,11 @@ class MusicPlayer {
                 if (file != null) {
                     file.remove(() => { });
                 }
-                finish();
+
+                  //=======================================
+                // 延时 2 秒，以防出现死循环
+                setTimeout(() => finish(), 1000 * 2);
+                //=======================================
             },
             (status) => {
                 if (status == Media.MEDIA_STOPPED) {
