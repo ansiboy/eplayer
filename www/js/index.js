@@ -95,7 +95,8 @@ class MusicPlayer {
                 num = 0;
             return num;
         };
-        playMusic(0);
+        let num = nextMusic(-1);
+        playMusic(num);
     }
     random(min, max) {
         return Math.floor(min + Math.random() * (max - min));
@@ -110,7 +111,10 @@ class MusicPlayer {
                 if (file != null) {
                     file.remove(() => { });
                 }
-                finish();
+                //=======================================
+                // 延时 2 秒，以防出现死循环
+                setTimeout(() => finish(), 1000 * 2);
+                //=======================================
             }, (status) => {
                 if (status == Media.MEDIA_STOPPED) {
                     finish();
