@@ -3,51 +3,67 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
         function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments)).next());
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
 class MusicPlayer {
     constructor(musicDirectory) {
+        this.playlists = new Array();
+        this.currentMusicIndex = -1;
         this.musicDirectory = musicDirectory;
         console.assert(this.musicDirectory != null);
-        window.setTimeout(() => {
-            this.start();
-        }, 1000 * 10);
+        // window.setTimeout(() => {
+        this.start();
+        // }, 1000 * 10);
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.updatePlayLists();
-            this.play();
-            this.downloadScheduleMusic(MusicPlayer.playlists);
+            // this.play();
+            this.downloadScheduleMusic(this.playlists);
             let second = 1000;
             let minute = second * 60;
             setInterval(() => __awaiter(this, void 0, void 0, function* () {
                 yield this.updatePlayLists();
-                this.downloadScheduleMusic(MusicPlayer.playlists);
+                this.downloadScheduleMusic(this.playlists);
             }), minute * 30);
-        });
-    }
-    play() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let lists = MusicPlayer.playlists; //await this.getPlaySchedule();
-            console.assert(lists != null);
-            //========================================================
-            // 如果没有播放列表，延时 60 秒，再尝试播放
-            if (lists.length == 0) {
-                let timeid = setTimeout(() => this.play(), 1000 * 60);
-                return;
-            }
-            //========================================================
-            for (let list of lists) {
-                let online_time = this.parseTime(list.online_time);
-                let offline_time = this.parseTime(list.offline_time);
-                let now = new Date(Date.now());
-                if (now >= online_time && now < offline_time) {
-                    this.playList(list, () => this.play());
+            setInterval(() => __awaiter(this, void 0, void 0, function* () {
+                // alert('setInterval');
+                // currentPlayList 不为空，为示正在播放中
+                if (this.currentPlayList != null)
+                    return;
+                let lists = this.playlists;
+                for (let list of lists) {
+                    let online_time = this.parseTime(list.online_time);
+                    let offline_time = this.parseTime(list.offline_time);
+                    let now = new Date(Date.now());
+                    if (now >= online_time && now < offline_time) {
+                        this.playList(list);
+                        break;
+                    }
                 }
-            }
+            }), 1000 * 5);
         });
     }
+    // private async play() {
+    //     let lists = this.playlists; //await this.getPlaySchedule();
+    //     console.assert(lists != null);
+    //     //========================================================
+    //     // 如果没有播放列表，延时 60 秒，再尝试播放
+    //     if (lists.length == 0) {
+    //         let timeid = setTimeout(() => this.play(), 1000 * 60);
+    //         return;
+    //     }
+    //     //========================================================
+    //     for (let list of lists) {
+    //         let online_time = this.parseTime(list.online_time);
+    //         let offline_time = this.parseTime(list.offline_time);
+    //         let now = new Date(Date.now());
+    //         if (now >= online_time && now < offline_time) {
+    //             this.playList(list);
+    //         }
+    //     }
+    // }
     parseTime(time) {
         let arr = time.split(':');
         console.assert(arr.length == 3);
@@ -61,8 +77,12 @@ class MusicPlayer {
         let d = new Date(year, month, date, hour, minute, second);
         return d;
     }
-    playList(list, finish) {
+    playList(list) {
+        this.currentPlayList = list;
         let musics = list.music_list || [];
+        let finish = () => {
+            this.currentPlayList = null;
+        };
         //========================================================
         // 如果没有音乐，延时 60 秒，避免死循环
         if (musics.length == 0) {
@@ -72,6 +92,7 @@ class MusicPlayer {
         //========================================================
         let offline_time = this.parseTime(list.offline_time);
         let playMusic = (num) => {
+            this.currentMusicIndex = num;
             this.playMusic(musics[num], () => {
                 if (offline_time <= new Date(Date.now())) {
                     finish();
@@ -95,7 +116,8 @@ class MusicPlayer {
                 num = 0;
             return num;
         };
-        playMusic(0);
+        let num = nextMusic(-1);
+        playMusic(num);
     }
     random(min, max) {
         return Math.floor(min + Math.random() * (max - min));
@@ -110,7 +132,10 @@ class MusicPlayer {
                 if (file != null) {
                     file.remove(() => { });
                 }
-                finish();
+                //=======================================
+                // 延时 2 秒，以防出现死循环
+                setTimeout(() => finish(), 1000 * 2);
+                //=======================================
             }, (status) => {
                 if (status == Media.MEDIA_STOPPED) {
                     finish();
@@ -185,12 +210,12 @@ class MusicPlayer {
                 let service = new Service();
                 let result = yield service.playSchedule();
                 if (result.code == CodeSuccess)
-                    MusicPlayer.playlists = result.data.playlist;
+                    this.playlists = result.data.playlist;
                 else
-                    MusicPlayer.playlists = [];
+                    this.playlists = [];
             }
             finally {
-                return MusicPlayer.playlists;
+                return this.playlists;
             }
         });
     }
@@ -213,8 +238,29 @@ class MusicPlayer {
         });
     }
 }
-MusicPlayer.playlists = new Array();
-class MusicPage {
+class MusicPage extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { musics: [], current: 0 };
+        setInterval(() => {
+            let musics = [];
+            if (this.props.player.currentPlayList != null) {
+                musics = this.props.player.currentPlayList.music_list || [];
+            }
+            this.state.musics = musics;
+            this.state.current = this.props.player.currentMusicIndex;
+            this.setState(this.state);
+        }, 1000 * 2);
+    }
+    render() {
+        let musics = this.state.musics;
+        let current = this.state.current;
+        return [
+            React.createElement("div", { key: "title", className: "title" }, "Title"),
+            React.createElement("div", { key: "musics", className: "music-list" }, musics.map((o, i) => (React.createElement("div", { key: o.mid, className: i == current ? "music-name active" : "music-name" }, o.name)))),
+            React.createElement("div", { key: "info", className: "info" }, "Info")
+        ];
+    }
 }
 class Application {
     constructor() {
@@ -224,6 +270,8 @@ class Application {
         return __awaiter(this, void 0, void 0, function* () {
             let musicDirectory = cordova.file.dataDirectory;
             let player = new MusicPlayer(musicDirectory);
+            let appElement = document.getElementsByClassName('app')[0];
+            ReactDOM.render(React.createElement(MusicPage, { player: player }), appElement);
         });
     }
     start() {

@@ -202,20 +202,37 @@ public class MainActivity extends CordovaActivity {
     }
 
 
-    void playSound(int times) {
-        Uri alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        MediaPlayer player = new MediaPlayer();
+    void playSound(final int code) {
+        Uri alert = null;// = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        if(code == SOUND_SUCCESS){
+            alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        }
+        else if(code == SOUND_CONFIG_ERROR){
+            alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        }
+        else if(code == SOUND_NETWORK_ERROR){
+            alert= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+        }
+        else {
+            alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL);
+        }
+
+
+        final MediaPlayer player = new MediaPlayer();
         try {
             player.setDataSource(this, alert);
             player.prepare();
-            for (int i = 0; i < times; i++) {
-                player.start();
-                Thread.sleep(1000);
-            }
+            player.start();
+
+            Timer timer = new Timer();
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    player.stop();
+                }
+            },8000);
 
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

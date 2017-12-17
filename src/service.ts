@@ -78,8 +78,8 @@ class Service {
 
         let item3: MusicItem = {
             "mid": 504, //歌曲id
-            "name": "Bach to the Future Triple Christmas Fugue in G  Deck The Halls,Twinkle Twinkle.mp3", //歌曲名
-            "path": "up_file=http://file.echomelody.com/music/20160408/absolute music/Christmas music/Bach to the Future Triple Christmas Fugue in G  Deck The Halls,Twinkle Twinkle.mp3" //资源路径
+            "name": "Ayleth's Song.mp3", //歌曲名
+            "path": "http://file.echomelody.com/music/20160408/absolute music/light music/Ayleth's Song.mp3" //资源路径
         }
         let item4: MusicItem = {
             "mid": 503, //歌曲id
