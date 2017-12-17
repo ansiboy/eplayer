@@ -94,6 +94,7 @@ ext {
 // PLUGIN GRADLE EXTENSIONS START
 apply from: "cordova-hot-code-push-plugin/hellocordova-chcp.gradle"
 apply from: "cordova-hot-code-push-local-dev-addon/hellocordova-chcp-localdev.gradle"
+apply from: "cordova-plugin-crosswalk-webview/hellocordova-xwalk.gradle"
 // PLUGIN GRADLE EXTENSIONS END
 
 def hasBuildExtras = file('build-extras.gradle').exists()

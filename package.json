@@ -14,6 +14,7 @@
     "cordova-browser": "^5.0.1",
     "cordova-hot-code-push-local-dev-addon": "^0.4.2",
     "cordova-hot-code-push-plugin": "^1.5.3",
+    "cordova-plugin-crosswalk-webview": "^2.3.0",
     "cordova-plugin-file": "^5.0.0",
     "cordova-plugin-file-transfer": "^1.7.0",
     "cordova-plugin-media": "^4.0.0",
@@ -26,7 +27,14 @@
       "cordova-hot-code-push-local-dev-addon": {},
       "cordova-plugin-file": {},
       "cordova-plugin-file-transfer": {},
-      "cordova-plugin-media": {}
+      "cordova-plugin-media": {},
+      "cordova-plugin-crosswalk-webview": {
+        "XWALK_VERSION": "23+",
+        "XWALK_LITEVERSION": "xwalk_core_library_canary:17+",
+        "XWALK_COMMANDLINE": "--disable-pull-to-refresh-effect",
+        "XWALK_MODE": "embedded",
+        "XWALK_MULTIPLEAPK": "true"
+      }
     },
     "platforms": [
       "android",

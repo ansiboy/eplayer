@@ -1,3 +1,11 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 class MusicPlayer {
     constructor(musicDirectory) {
         this.playlists = new Array();
@@ -9,30 +17,32 @@ class MusicPlayer {
         this.start();
         // }, 1000 * 2);
     }
-    async start() {
-        await this.updatePlayLists();
-        // this.play();
-        this.downloadScheduleMusic(this.playlists);
-        let second = 1000;
-        let minute = second * 60;
-        setInterval(async () => {
-            await this.updatePlayLists();
+    start() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.updatePlayLists();
+            // this.play();
             this.downloadScheduleMusic(this.playlists);
-        }, minute * 30);
-        setInterval(async () => {
-            if (this.currentPlayList != null)
-                return;
-            let lists = this.playlists;
-            for (let list of lists) {
-                let online_time = this.parseTime(list.online_time);
-                let offline_time = this.parseTime(list.offline_time);
-                let now = new Date(Date.now());
-                if (now >= online_time && now < offline_time) {
-                    this.playList(list);
-                    break;
+            let second = 1000;
+            let minute = second * 60;
+            setInterval(() => __awaiter(this, void 0, void 0, function* () {
+                yield this.updatePlayLists();
+                this.downloadScheduleMusic(this.playlists);
+            }), minute * 30);
+            setInterval(() => __awaiter(this, void 0, void 0, function* () {
+                if (this.currentPlayList != null)
+                    return;
+                let lists = this.playlists;
+                for (let list of lists) {
+                    let online_time = this.parseTime(list.online_time);
+                    let offline_time = this.parseTime(list.offline_time);
+                    let now = new Date(Date.now());
+                    if (now >= online_time && now < offline_time) {
+                        this.playList(list);
+                        break;
+                    }
                 }
-            }
-        }, 1000 * 5);
+            }), 1000 * 5);
+        });
     }
     parseTime(time) {
         let arr = time.split(':');
@@ -96,28 +106,30 @@ class MusicPlayer {
         let value = Math.floor(Math.random() * (max - min + 1)) + min;
         return value;
     }
-    async playMusic(music, finish) {
-        let file = await this.musicLocalFile(music);
-        let fileExists = file != null;
-        let src = file != null ? file.nativeURL : music.path;
-        // src = music.path;
-        let media = new Media(src, () => {
-        }, err => {
-            if (file != null) {
-                file.remove(() => { });
-            }
-            //=======================================
-            // 延时 2 秒，以防出现死循环
-            setTimeout(() => {
-                finish();
-            }, 1000 * 2);
-            //=======================================
-        }, (status) => {
-            if (status == Media.MEDIA_STOPPED) {
-                finish();
-            }
+    playMusic(music, finish) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let file = yield this.musicLocalFile(music);
+            let fileExists = file != null;
+            let src = file != null ? file.nativeURL : music.path;
+            // src = music.path;
+            let media = new Media(src, () => {
+            }, err => {
+                if (file != null) {
+                    file.remove(() => { });
+                }
+                //=======================================
+                // 延时 2 秒，以防出现死循环
+                setTimeout(() => {
+                    finish();
+                }, 1000 * 2);
+                //=======================================
+            }, (status) => {
+                if (status == Media.MEDIA_STOPPED) {
+                    finish();
+                }
+            });
+            media.play();
         });
-        media.play();
     }
     musicLocalPath(music) {
         let arr = music.path.split('/');
@@ -181,18 +193,20 @@ class MusicPlayer {
             }, err => reject(err));
         });
     }
-    async updatePlayLists() {
-        try {
-            let service = new Service();
-            let result = await service.playSchedule();
-            if (result.code == CodeSuccess)
-                this.playlists = result.data.playlist;
-            else
-                this.playlists = [];
-        }
-        finally {
-            return this.playlists;
-        }
+    updatePlayLists() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let service = new Service();
+                let result = yield service.playSchedule();
+                if (result.code == CodeSuccess)
+                    this.playlists = result.data.playlist;
+                else
+                    this.playlists = [];
+            }
+            finally {
+                return this.playlists;
+            }
+        });
     }
     clear() {
         window.resolveLocalFileSystemURL(this.musicDirectory, (entry) => {
@@ -207,54 +221,56 @@ class MusicPlayer {
             });
         });
     }
-    async downloadScheduleMusic(playlists) {
-        // Check Disk
-        let downloadMusic = (musics, index) => {
-            if (index > musics.length - 1)
-                return Promise.resolve();
-            let music = musics[index];
-            console.log(`download music ${index}`);
-            return this.musicLocalFile(music)
-                .then(musicFile => {
-                if (musicFile) {
-                    console.log(`file exists, path ${musicFile.nativeURL}`);
-                    return Promise.resolve(musicFile);
-                }
-                let musicPath = this.musicLocalPath(music);
-                return this.downloadFile(music.path, musicPath);
-            })
-                .catch(() => {
-                return Promise.resolve(null);
-            })
-                .then(() => {
-                return downloadMusic(musics, index + 1);
-            });
-        };
-        let downloadList = (playlists, index) => {
-            if (index > playlists.length - 1)
-                return;
-            console.log(`download list ${index}`);
-            downloadMusic(playlists[index].music_list, 0)
-                .then(() => downloadList(playlists, index + 1))
-                .catch(() => downloadList(playlists, index + 1));
-        };
-        downloadList(playlists, 0);
-        // for (let playlist of playlists) {
-        //     let musics = playlist.music_list;
-        //     for (let music of musics) {
-        //         let musicFile = await this.musicLocalFile(music);
-        //         if (musicFile == null) {
-        //             try {
-        //                 let musicPath = this.musicLocalPath(music);
-        //                 console.log(`to download ${musicPath}`)
-        //                 this.downloadFile(music.path, musicPath);
-        //             }
-        //             catch (err) {
-        //                 debugger;
-        //             }
-        //         }
-        //     }
-        // }
+    downloadScheduleMusic(playlists) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Check Disk
+            let downloadMusic = (musics, index) => {
+                if (index > musics.length - 1)
+                    return Promise.resolve();
+                let music = musics[index];
+                console.log(`download music ${index}`);
+                return this.musicLocalFile(music)
+                    .then(musicFile => {
+                    if (musicFile) {
+                        console.log(`file exists, path ${musicFile.nativeURL}`);
+                        return Promise.resolve(musicFile);
+                    }
+                    let musicPath = this.musicLocalPath(music);
+                    return this.downloadFile(music.path, musicPath);
+                })
+                    .catch(() => {
+                    return Promise.resolve(null);
+                })
+                    .then(() => {
+                    return downloadMusic(musics, index + 1);
+                });
+            };
+            let downloadList = (playlists, index) => {
+                if (index > playlists.length - 1)
+                    return;
+                console.log(`download list ${index}`);
+                downloadMusic(playlists[index].music_list, 0)
+                    .then(() => downloadList(playlists, index + 1))
+                    .catch(() => downloadList(playlists, index + 1));
+            };
+            downloadList(playlists, 0);
+            // for (let playlist of playlists) {
+            //     let musics = playlist.music_list;
+            //     for (let music of musics) {
+            //         let musicFile = await this.musicLocalFile(music);
+            //         if (musicFile == null) {
+            //             try {
+            //                 let musicPath = this.musicLocalPath(music);
+            //                 console.log(`to download ${musicPath}`)
+            //                 this.downloadFile(music.path, musicPath);
+            //             }
+            //             catch (err) {
+            //                 debugger;
+            //             }
+            //         }
+            //     }
+            // }
+        });
     }
 }
 class MusicPage extends React.Component {
@@ -285,23 +301,25 @@ class Application {
     constructor() {
         document.addEventListener('deviceready', () => this.on_deviceready(), false);
     }
-    async on_deviceready() {
-        let dataDirectory = cordova.file.dataDirectory;
-        let musicDirectory = await new Promise((resolve, reject) => {
-            window.resolveLocalFileSystemURL(cordova.file.dataDirectory, (entry) => {
-                entry.getDirectory('musics1', { create: true }, entry => {
-                    // entry.remove(()=>{});
-                    resolve(entry);
-                }, err => {
+    on_deviceready() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let dataDirectory = cordova.file.dataDirectory;
+            let musicDirectory = yield new Promise((resolve, reject) => {
+                window.resolveLocalFileSystemURL(cordova.file.dataDirectory, (entry) => {
+                    entry.getDirectory('musics1', { create: true }, entry => {
+                        // entry.remove(()=>{});
+                        resolve(entry);
+                    }, err => {
+                        reject(err);
+                    });
+                }, (err) => {
                     reject(err);
                 });
-            }, (err) => {
-                reject(err);
             });
+            let player = new MusicPlayer(musicDirectory.nativeURL);
+            let appElement = document.getElementsByClassName('app')[0];
+            ReactDOM.render(React.createElement(MusicPage, { player: player }), appElement);
         });
-        let player = new MusicPlayer(musicDirectory.nativeURL);
-        let appElement = document.getElementsByClassName('app')[0];
-        ReactDOM.render(React.createElement(MusicPage, { player: player }), appElement);
     }
     start() {
     }

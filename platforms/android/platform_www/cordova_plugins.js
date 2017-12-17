@@ -230,7 +230,8 @@ module.exports.metadata =
   "cordova-hot-code-push-local-dev-addon": "0.4.2",
   "cordova-plugin-file": "5.0.0",
   "cordova-plugin-file-transfer": "1.7.0",
-  "cordova-plugin-media": "4.0.0"
+  "cordova-plugin-media": "4.0.0",
+  "cordova-plugin-crosswalk-webview": "2.3.0"
 };
 // BOTTOM OF METADATA
 });

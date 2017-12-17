@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es2017",
+        "target": "es6",
         "module": "none",
         "outDir": "../www/js",
         //"outDir": "../platforms/android/assets/www/js",

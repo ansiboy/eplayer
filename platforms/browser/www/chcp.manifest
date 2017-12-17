@@ -1,7 +1,7 @@
 [
   {
     "file": "css/index.css",
-    "hash": "e46d9a1c456a9c913ca10f3c16d50000"
+    "hash": "23ba2470535bd09cccc0bf565d2afc24"
   },
   {
     "file": "img/logo.png",
@@ -9,22 +9,30 @@
   },
   {
     "file": "index.html",
-    "hash": "7f3e3fe116d467e47edc899cbc3d15e7"
-  },
-  {
-    "file": "js/cordova-plugin-media/cordova-plugin-media-tests.js",
-    "hash": "b50a654b0db61c9c5d7266c74fbd4adf"
+    "hash": "750ea5aa515b51be6c299923ede99176"
   },
   {
     "file": "js/index.js",
-    "hash": "daa2deab888092478589f61eb63d593f"
+    "hash": "59d8e753bb0a51dba1a72b9911edfbde"
+  },
+  {
+    "file": "js/react-dom.js",
+    "hash": "cf0f86f5be5714bf9b6e54a3e0f447c2"
+  },
+  {
+    "file": "js/react.js",
+    "hash": "3ea2dbe6cceb46089c827c11050a2c97"
   },
   {
     "file": "js/service.js",
-    "hash": "20075185ca57d62be8a462f642249e07"
+    "hash": "90428e80c209965ecb3fbe65ecc26392"
   },
   {
     "file": "js/typings/cordova-plugin-file-transfer/cordova-plugin-file-transfer-tests.js",
     "hash": "70baf328c331a5b355299155551d6735"
+  },
+  {
+    "file": "js/typings/cordova-plugin-media/cordova-plugin-media-tests.js",
+    "hash": "b50a654b0db61c9c5d7266c74fbd4adf"
   }
 ]

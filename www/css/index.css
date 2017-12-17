@@ -46,13 +46,15 @@ body {
 .title {
     position: fixed;
     top: 0;
-    /* height: 30px; */
+    /* height: 30px;  */
     width: 100%;
-    padding-top: 10px;
     text-align: center;
     color: white;
-    background-color: rgba(47, 201, 60, 0.644);
-    padding: 6px 10px 6px 10px;
+    background-color: rgb(8, 138, 19);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 .info {
@@ -63,13 +65,13 @@ body {
     padding-top: 10px;
     text-align: left;
     color: white;
-    background-color: rgba(25, 90, 31, 0.644);
-    padding: 4px 10px 4px 10px;
+    background-color:rgb(8, 138, 19);
+    padding: 8px 10px 8px 10px;
 }
 
 .music-list {
-    padding-top: 50px;
-    padding-bottom: 50px;
+    padding-top: 40px;
+    padding-bottom: 40px;
 }
 
 .music-name {

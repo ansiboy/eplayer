@@ -34,8 +34,8 @@ class Service {
             };
             let item3 = {
                 "mid": 504,
-                "name": "Bach to the Future Triple Christmas Fugue in G  Deck The Halls,Twinkle Twinkle.mp3",
-                "path": "up_file=http://file.echomelody.com/music/20160408/absolute music/Christmas music/Bach to the Future Triple Christmas Fugue in G  Deck The Halls,Twinkle Twinkle.mp3" //资源路径
+                "name": "Ayleth's Song.mp3",
+                "path": "http://file.echomelody.com/music/20160408/absolute music/light music/Ayleth's Song.mp3" //资源路径
             };
             let item4 = {
                 "mid": 503,

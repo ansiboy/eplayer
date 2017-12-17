@@ -35,6 +35,34 @@
             {
               "xml": "<feature name=\"Media\"><param name=\"android-package\" value=\"org.apache.cordova.media.AudioHandler\" /></feature>",
               "count": 1
+            },
+            {
+              "xml": "<preference name=\"webView\" value=\"org.crosswalk.engine.XWalkWebViewEngine\" />",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"xwalkVersion\" value=\"23+\" />",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"xwalkLiteVersion\" value=\"xwalk_core_library_canary:17+\" />",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"xwalkCommandLine\" value=\"--disable-pull-to-refresh-effect\" />",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"xwalkMode\" value=\"embedded\" />",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"xwalkMultipleApk\" value=\"true\" />",
+              "count": 1
+            },
+            {
+              "xml": "<preference name=\"android-minSdkVersion\" value=\"16\" />",
+              "count": 1
             }
           ]
         }
@@ -56,6 +84,14 @@
             },
             {
               "xml": "<uses-permission android:name=\"android.permission.READ_PHONE_STATE\" />",
+              "count": 1
+            },
+            {
+              "xml": "<uses-permission android:name=\"android.permission.ACCESS_NETWORK_STATE\" />",
+              "count": 1
+            },
+            {
+              "xml": "<uses-permission android:name=\"android.permission.ACCESS_WIFI_STATE\" />",
               "count": 1
             }
           ],
@@ -108,6 +144,14 @@
       "PACKAGE_NAME": "io.cordova.hellocordova"
     },
     "cordova-plugin-media": {
+      "PACKAGE_NAME": "io.cordova.hellocordova"
+    },
+    "cordova-plugin-crosswalk-webview": {
+      "XWALK_VERSION": "23+",
+      "XWALK_LITEVERSION": "xwalk_core_library_canary:17+",
+      "XWALK_COMMANDLINE": "--disable-pull-to-refresh-effect",
+      "XWALK_MODE": "embedded",
+      "XWALK_MULTIPLEAPK": "true",
       "PACKAGE_NAME": "io.cordova.hellocordova"
     }
   },
@@ -341,6 +385,7 @@
     "cordova-hot-code-push-local-dev-addon": "0.4.2",
     "cordova-plugin-file": "5.0.0",
     "cordova-plugin-file-transfer": "1.7.0",
-    "cordova-plugin-media": "4.0.0"
+    "cordova-plugin-media": "4.0.0",
+    "cordova-plugin-crosswalk-webview": "2.3.0"
   }
 }
