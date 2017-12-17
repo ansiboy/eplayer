@@ -9,15 +9,19 @@
   },
   {
     "file": "index.html",
-    "hash": "fc1094d26105a7a66806bf5a3373b182"
+    "hash": "7f3e3fe116d467e47edc899cbc3d15e7"
+  },
+  {
+    "file": "js/cordova-plugin-media/cordova-plugin-media-tests.js",
+    "hash": "b50a654b0db61c9c5d7266c74fbd4adf"
   },
   {
     "file": "js/index.js",
-    "hash": "5a39ef4db6fbb562d4d1898589346853"
+    "hash": "a29168cf604f10efd6f8623bf149246b"
   },
   {
     "file": "js/service.js",
-    "hash": "907b25e563532dd4c8bffd68f45fc5f7"
+    "hash": "20075185ca57d62be8a462f642249e07"
   },
   {
     "file": "js/typings/cordova-plugin-file-transfer/cordova-plugin-file-transfer-tests.js",

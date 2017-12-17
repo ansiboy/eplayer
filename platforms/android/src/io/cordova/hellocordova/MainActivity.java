@@ -263,7 +263,8 @@ public class MainActivity extends CordovaActivity {
     }
 
     boolean isNetworkAvailable() {
-        ConnectivityManager cm = (ConnectivityManager) this
+        Context context = this.getApplicationContext();
+        ConnectivityManager cm = (ConnectivityManager) context
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo info = cm.getActiveNetworkInfo();
@@ -271,7 +272,8 @@ public class MainActivity extends CordovaActivity {
     }
 
     private boolean setWifi(String ssid, String password) {
-        WifiManager wm = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        Context context = this.getApplicationContext();
+        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
         if (!wm.isWifiEnabled()) {
             wm.setWifiEnabled(true);

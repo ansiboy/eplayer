@@ -6,11 +6,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+const PlayOrderType = 0;
+const PlayRadomType = 1;
+const CodeSuccess = 0;
 class Service {
     /**
      * 获取音乐播放计划
      */
-    playlist() {
+    playSchedule() {
         return __awaiter(this, void 0, void 0, function* () {
             let item1 = {
                 "mid": 506,

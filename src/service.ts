@@ -1,6 +1,9 @@
 interface PlayList {
     plid: number,
     music_list: Array<MusicItem>,
+    /**
+     * 播放开始时间，格式：08:00:00
+     */
     online_time: string,
     offline_time: string,
     /**
@@ -10,6 +13,10 @@ interface PlayList {
      */
     type: number
 }
+
+const PlayOrderType = 0;
+const PlayRadomType = 1;
+const CodeSuccess = 0;
 
 interface MusicItem {
     mid: number,
@@ -49,7 +56,7 @@ class Service {
     /**
      * 获取音乐播放计划
      */
-    async playlist(): Promise<PlayListResult> {
+    async playSchedule(): Promise<PlayListResult> {
         let item1: MusicItem = {
             "mid": 506, //歌曲id
             "name": "Chorale Prelude in F Minor, We Three Kings of Orient Are.mp3", //歌曲名

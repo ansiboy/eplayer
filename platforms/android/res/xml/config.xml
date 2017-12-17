@@ -1,45 +1,48 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="io.cordova.hellocordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <feature name="HotCodePush">
-        <param name="android-package" value="com.nordnetab.chcp.main.HotCodePushPlugin" />
-        <param name="onload" value="true" />
-    </feature>
-    <feature name="HotCodePushLocalDevMode">
-        <param name="android-package" value="com.nordnetab.chcp.localdev.HotCodePushLocalDevPlugin" />
-        <param name="onload" value="true" />
-    </feature>
-    <name>eplayer</name>
-    <description>
+  <feature name="Whitelist">
+    <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin"/>
+    <param name="onload" value="true"/>
+  </feature>
+  <feature name="HotCodePush">
+    <param name="android-package" value="com.nordnetab.chcp.main.HotCodePushPlugin"/>
+    <param name="onload" value="true"/>
+  </feature>
+  <feature name="HotCodePushLocalDevMode">
+    <param name="android-package" value="com.nordnetab.chcp.localdev.HotCodePushLocalDevPlugin"/>
+    <param name="onload" value="true"/>
+  </feature>
+  <feature name="File">
+    <param name="android-package" value="org.apache.cordova.file.FileUtils"/>
+    <param name="onload" value="true"/>
+  </feature>
+  <feature name="FileTransfer">
+    <param name="android-package" value="org.apache.cordova.filetransfer.FileTransfer"/>
+  </feature>
+  <feature name="Media">
+    <param name="android-package" value="org.apache.cordova.media.AudioHandler"/>
+  </feature>
+  <allow-navigation href="cdvfile:*"/>
+  <name>eplayer</name>
+  <description>
         A sample Apache Cordova application that responds to the deviceready event.
     </description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">
+  <author email="dev@cordova.apache.org" href="http://cordova.io">
         Apache Cordova Team
     </author>
-    <content src="index.html" />
-    <access origin="*" />
-    <allow-intent href="http://*/*" />
-    <allow-intent href="https://*/*" />
-    <allow-intent href="tel:*" />
-    <allow-intent href="sms:*" />
-    <allow-intent href="mailto:*" />
-    <allow-intent href="geo:*" />
-    <allow-intent href="market:*" />
-    <chcp>
-        <config-file url="http://localhost:31284/chcp.json" />
-        <local-development enabled="true" />
-    </chcp>
-    <preference name="loglevel" value="DEBUG" />
-    <preference name="webView" value="org.crosswalk.engine.XWalkWebViewEngine" />
-    <preference name="xwalkVersion" value="23+" />
-    <preference name="xwalkLiteVersion" value="xwalk_core_library_canary:17+" />
-    <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect" />
-    <preference name="xwalkMode" value="embedded" />
-    <preference name="xwalkMultipleApk" value="true" />
-    <preference name="android-minSdkVersion" value="16" />
-    <preference name="loadUrlTimeoutValue" value="60000" />
-    <feature name="File">
-        <param name="android-package" value="org.apache.cordova.file.FileUtils" />
-        <param name="onload" value="true" />
-    </feature>
-    <allow-navigation href="cdvfile:*" />
+  <content src="index.html"/>
+  <access origin="*"/>
+  <allow-intent href="http://*/*"/>
+  <allow-intent href="https://*/*"/>
+  <allow-intent href="tel:*"/>
+  <allow-intent href="sms:*"/>
+  <allow-intent href="mailto:*"/>
+  <allow-intent href="geo:*"/>
+  <allow-intent href="market:*"/>
+  <preference name="loglevel" value="DEBUG"/>
+  <preference name="loadUrlTimeoutValue" value="60000"/>
+  <chcp>
+    <local-development enabled="true"/>
+    <config-file url="https://5ea7db26.ngrok.io/chcp.json"/>
+  </chcp>
 </widget>
