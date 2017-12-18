@@ -2,3 +2,5 @@ platforms/android/.gradle
 platforms/android/.idea
 build
 node_modules
+platforms/android/cordova/node_modules
+platforms/android/assets

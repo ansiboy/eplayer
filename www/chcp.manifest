@@ -13,7 +13,7 @@
   },
   {
     "file": "js/index.js",
-    "hash": "5c5cdcbea4eee589c526b8d932a5ad10"
+    "hash": "e19c73dfe30e358f62ce365960e08a5f"
   },
   {
     "file": "js/react-dom.js",
@@ -25,7 +25,7 @@
   },
   {
     "file": "js/service.js",
-    "hash": "6686949f16ac3ce0416c11996466aece"
+    "hash": "e8a10ae06e3f4cd10995d8a07946f5ec"
   },
   {
     "file": "js/typings/cordova-plugin-file-transfer/cordova-plugin-file-transfer-tests.js",
