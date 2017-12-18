@@ -1,19 +1,21 @@
 class MusicPlayer {
-    private musicDirectory: string;
+    private _musicDirectory: string;
     private playlists = new Array<PlayList>();
 
     currentPlayList: PlayList;
     currentMusicIndex: number = -1;
+    currentMusic: Media;
 
     constructor(musicDirectory: string) {
 
-        this.musicDirectory = musicDirectory;
-        console.assert(this.musicDirectory != null);
+        this._musicDirectory = musicDirectory;
+        console.assert(this._musicDirectory != null);
 
-        this.clear();
-        // setTimeout(() => {
         this.start();
-        // }, 1000 * 2);
+    }
+
+    get musicDirectory() {
+        return this._musicDirectory;
     }
 
     private async start() {
@@ -144,10 +146,13 @@ class MusicPlayer {
             },
             (status) => {
                 if (status == Media.MEDIA_STOPPED) {
+                    this.currentMusic = null;
+                    media.release();
                     finish();
                 }
             });
 
+        this.currentMusic = media;
         media.play();
 
     }
@@ -155,14 +160,14 @@ class MusicPlayer {
     private musicLocalPath(music: MusicItem) {
         let arr = music.path.split('/');
         let fileName = arr[arr.length - 1];
-        let filePath = this.musicDirectory + fileName;
+        let filePath = this._musicDirectory + fileName;
         return filePath;
     }
 
     private musicLocalFile(music: MusicItem): Promise<FileEntry> {
         let arr = music.path.split('/');
         let fileName = arr[arr.length - 1];
-        let directoryName = this.musicDirectory;
+        let directoryName = this._musicDirectory;
         return new Promise((resolve, reject) => {
             window.resolveLocalFileSystemURL(directoryName,
                 (entry: Entry) => {
@@ -238,23 +243,24 @@ class MusicPlayer {
         })
     }
 
-    private async updatePlayLists(): Promise<PlayList[]> {
-        try {
-            let service = new Service();
-            let result = await service.playSchedule();
-            if (result.code == CodeSuccess)
-                this.playlists = result.data.playlist;
-            else
-                this.playlists = [];
+    private async updatePlayLists() {
+        // try {
+        let service = new Service();
+        // let result = await service.playSchedule();
+        // if (result.code == CodeSuccess)
+        //     this.playlists = result.data.playlist;
+        // else
+        //     this.playlists = [];
 
-        }
-        finally {
-            return this.playlists;
-        }
+        // }
+        // finally {
+        //     return this.playlists;
+        // }
+        this.playlists = await service.playlists();
     }
 
     private clear() {
-        window.resolveLocalFileSystemURL(this.musicDirectory,
+        window.resolveLocalFileSystemURL(this._musicDirectory,
             (entry: DirectoryEntry) => {
                 let reader = entry.createReader();
                 reader.readEntries((entries) => {
@@ -332,41 +338,125 @@ class MusicPlayer {
 }
 
 class MusicPage extends React.Component<{ player: MusicPlayer },
-    { musics: MusicItem[], current: number }> {
+    { musics: MusicItem[], current: number, title: string, info: string, infos: { name: string, value?: string }[], showAllInfos: boolean }> {
+
+    private startTime: number;
+
     constructor(props) {
         super(props);
 
-        this.state = { musics: [], current: 0 };
+        this.state = { musics: [], current: 0, title: "", info: "", infos: [], showAllInfos: false };
+        this.startTime = Date.now();
+    }
+
+    private parseTime(time: string) {
+        let arr = time.split(':');
+        console.assert(arr.length == 3);
+        let hour = Number.parseInt(arr[0]);
+        let minute = Number.parseInt(arr[1]);
+        let second = Number.parseInt(arr[2]);
+
+        let today = new Date(Date.now());
+        let year = today.getFullYear();
+        let month = today.getMonth();
+        let date = today.getDate();
+
+        let d = new Date(year, month, date, hour, minute, second);
+        return d;
+    }
+
+    componentDidMount() {
+
+        this.state.infos[0] = { name: `磁盘空间` };
+        this.state.infos[1] = { name: `重启时间` };
+        this.state.infos[2] = { name: `已下载音乐` };
+
+        var eplayer = new EPlayer();
+        eplayer.freeSpace(this.props.player.musicDirectory).then(obj => {
+
+            this.state.infos[0].value = `总容量:${Math.floor(obj.total / 1024)}M 剩余:${Math.floor(obj.free / 1024)}M`;
+            this.setState(this.state);
+        });
 
         setInterval(() => {
-            let musics = [];
+            let musics = new Array<MusicItem>();
             if (this.props.player.currentPlayList != null) {
                 musics = this.props.player.currentPlayList.music_list || [];
             }
 
             this.state.musics = musics;
             this.state.current = this.props.player.currentMusicIndex;
+            let music = musics[this.state.current];
+            if (music != null) {
+                this.state.title = music.name;
+            }
+
+
+            let runDuration = Date.now() - this.startTime;
+            let seconds = Math.floor((runDuration / 1000));
+            let minutes = 0;
+            let hours = 0;
+            let days = 0;
+            if (seconds > 60) {
+                minutes = Math.floor(seconds / 60);
+                seconds = seconds % 60;
+            }
+            if (minutes > 60) {
+                hours = Math.floor(minutes / 60);
+                minutes = minutes % 60;
+            }
+            if (hours > 24) {
+                days = Math.floor(hours / 24);
+                hours = hours % 24;
+            }
+
+
+            this.state.info = `系统已经运行${days}天${hours}小时${minutes}分${seconds}秒`;
+
             this.setState(this.state);
 
-        }, 1000 * 2);
 
+        }, 1000 * 1);
     }
+
     render() {
         let musics = this.state.musics;
         let current = this.state.current;
+        let { title, info, showAllInfos, infos } = this.state;
+        let music = this.props.player.currentMusic;
         return [
             <div key="title" className="title">
-                Title
+                {title}
             </div>,
             <div key="musics" className="music-list">
                 {musics.map((o, i) => (
                     <div key={o.mid} className={i == current ? "music-name active" : "music-name"}>
-                        {o.name}
+                        {o.name} {i == current && music != null ?
+                            <span ref={(e: HTMLElement) => {
+                                if (!e) return;
+                                music.getCurrentPosition(position => {
+                                    e.innerHTML = ` (${Math.floor(music.getDuration() - position)}/${Math.floor(music.getDuration())})`;
+                                })
+                            }}>
+
+                            </span> : null}
                     </div>
                 ))}
             </div>,
-            <div key="info" className="info">
-                Info
+            <div key="infos" className="infos"
+                onClick={() => {
+                    this.state.showAllInfos = !this.state.showAllInfos;
+                    this.setState(this.state);
+                }}>
+                {showAllInfos ? infos.map((o, i) =>
+                    <div className="item" key={i}>
+                        <div style={{ float: 'right' }}>{o.value}</div>
+                        <div>{o.name}</div>
+                    </div>
+                ) : null}
+                <div className="item">
+                    {info}
+                </div>
             </div>
         ];
     }
@@ -408,6 +498,39 @@ class Application {
 
     }
 }
+
+class EPlayer {
+    private serviceName = "EPlayer";
+    private execute() {
+
+    }
+    reboot() {
+        cordova.exec(
+            () => {
+                debugger
+            },
+            () => {
+                debugger;
+            }, this.serviceName, "reboot"
+        );
+    }
+    freeSpace(dir: string) {
+        if (dir.startsWith('file://')) {
+            dir = dir.substr('file://'.length);
+        }
+        return new Promise<{ total: number, free: number }>((resolve, reject) => {
+            cordova.exec(
+                (obj: { total: number, free: number }) => {
+                    resolve(obj);
+                },
+                (err) => {
+                    reject(err);
+                }, this.serviceName, "freeSpace", [dir]
+            )
+        })
+    }
+}
+
 
 let app = new Application();
 app.start();

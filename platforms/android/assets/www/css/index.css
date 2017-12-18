@@ -50,11 +50,12 @@ body {
     width: 100%;
     text-align: center;
     color: white;
-    background-color: rgba(47, 201, 60, 0.644);
+    background-color: rgb(8, 138, 19);
     padding-top: 10px;
     padding-bottom: 10px;
     padding-left: 0px;
     padding-right: 0px;
+    min-height: 16px;
 }
 
 .info {
@@ -65,8 +66,9 @@ body {
     padding-top: 10px;
     text-align: left;
     color: white;
-    background-color: rgba(25, 90, 31, 0.644);
+    background-color:rgb(8, 138, 19);
     padding: 8px 10px 8px 10px;
+    min-height: 16px;
 }
 
 .music-list {

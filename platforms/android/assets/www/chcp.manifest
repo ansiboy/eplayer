@@ -1,7 +1,7 @@
 [
   {
     "file": "css/index.css",
-    "hash": "fcfe08a39b14c202326de64c18c3d9bb"
+    "hash": "86e7b742c61c1f99a3656ff66a9ff95e"
   },
   {
     "file": "img/logo.png",
@@ -9,11 +9,11 @@
   },
   {
     "file": "index.html",
-    "hash": "750ea5aa515b51be6c299923ede99176"
+    "hash": "49df4c46d9beea49e19f450c2448ec07"
   },
   {
     "file": "js/index.js",
-    "hash": "5c5cdcbea4eee589c526b8d932a5ad10"
+    "hash": "8e2c66a2e3a7eb2837dfeebbf2aa4f18"
   },
   {
     "file": "js/react-dom.js",
@@ -25,7 +25,7 @@
   },
   {
     "file": "js/service.js",
-    "hash": "6686949f16ac3ce0416c11996466aece"
+    "hash": "d7fbb6b7f83bf89c0007bd8fc71e5b62"
   },
   {
     "file": "js/typings/cordova-plugin-file-transfer/cordova-plugin-file-transfer-tests.js",

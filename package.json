@@ -15,6 +15,7 @@
     "cordova-hot-code-push-local-dev-addon": "^0.4.2",
     "cordova-hot-code-push-plugin": "^1.5.3",
     "cordova-plugin-crosswalk-webview": "^2.3.0",
+    "cordova-plugin-device": "^1.1.7",
     "cordova-plugin-file": "^5.0.0",
     "cordova-plugin-file-transfer": "^1.7.0",
     "cordova-plugin-media": "^4.0.0",

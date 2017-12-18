@@ -22,14 +22,14 @@
   <feature name="Media">
     <param name="android-package" value="org.apache.cordova.media.AudioHandler"/>
   </feature>
+  <feature name="EPlayer">
+    <param name="android-package" value="io.cordova.hellocordova.EPlayer"/>
+    <param name="onload" value="true"/>
+  </feature>
   <allow-navigation href="cdvfile:*"/>
   <name>eplayer</name>
-  <description>
-        A sample Apache Cordova application that responds to the deviceready event.
-    </description>
-  <author email="dev@cordova.apache.org" href="http://cordova.io">
-        Apache Cordova Team
-    </author>
+  <description>        A sample Apache Cordova application that responds to the deviceready event.    </description>
+  <author email="dev@cordova.apache.org" href="http://cordova.io">        Apache Cordova Team    </author>
   <content src="index.html"/>
   <access origin="*"/>
   <allow-intent href="http://*/*"/>
@@ -50,6 +50,6 @@
   <preference name="loadUrlTimeoutValue" value="60000"/>
   <chcp>
     <local-development enabled="true"/>
-    <config-file url="https://9c4e13ff.ngrok.io/chcp.json"/>
+    <config-file url="https://4154ebc5.ngrok.io/chcp.json"/>
   </chcp>
 </widget>

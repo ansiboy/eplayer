@@ -11,55 +11,71 @@ const PlayRadomType = 1;
 const CodeSuccess = 0;
 class Service {
     /**
-     * 获取音乐播放计划
-     */
-    playSchedule() {
+    * 获取音乐播放计划
+    */
+    _playSchedule() {
         return __awaiter(this, void 0, void 0, function* () {
-            let item1 = {
-                "mid": 506,
-                "name": "Chorale Prelude in F Minor, We Three Kings of Orient Are.mp3",
-                "path": "http://file.echomelody.com/music/20160408/absolute music/Christmas music/Chorale Prelude in F Minor, We Three Kings of Orient Are.mp3" //资源路径
-            };
-            let item2 = {
-                "mid": 501,
-                "name": "Ayleth's Song.mp3",
-                "path": "http://file.echomelody.com/music/20160408/absolute music/light music/Ayleth's Song.mp3" //资源路径
-            };
-            let playlist1 = {
-                "plid": 1,
-                "online_time": "08:00:00",
-                "offline_time": "12:00:00",
-                "type": 0,
-                music_list: [item1, item2]
-            };
-            let item3 = {
-                "mid": 504,
-                "name": "Ayleth's Song.mp3",
-                "path": "http://file.echomelody.com/music/20160408/absolute music/light music/Ayleth's Song.mp3" //资源路径
-            };
-            let item4 = {
-                "mid": 503,
-                "name": "Atmospheric Christmas.mp3",
-                "path": "http://file.echomelody.com/music/20160408/absolute music/Christmas music/Atmospheric Christmas.mp3" //资源路径
-            };
-            let playlist2 = {
-                "plid": 2,
-                "online_time": "12:00:00",
-                "offline_time": "23:00:00",
-                "type": 1,
-                music_list: [item3, item4]
-            };
-            let result = {
+            return {
                 "code": 0,
                 "store": "1号店",
                 "msg": "成功",
-                data: {
+                "data": {
                     "psid": 1,
                     "name": "hhh",
-                    playlist: [playlist1, playlist2]
+                    playlist: [
+                        {
+                            "plid": 1,
+                            "online_time": "00:00:00",
+                            "offline_time": "12:00:00",
+                            "type": 0,
+                            music_list: [
+                                {
+                                    "mid": 506,
+                                    "name": "Chorale Prelude in F Minor, We Three Kings of Orient Are.mp3",
+                                    "path": "http://file.echomelody.com/music/20160408/absolute music/Christmas music/Chorale Prelude in F Minor, We Three Kings of Orient Are.mp3" //资源路径
+                                },
+                                {
+                                    "mid": 501,
+                                    "name": "Ayleth's Song.mp3",
+                                    "path": "http://file.echomelody.com/music/20160408/absolute music/light music/Ayleth's Song.mp3" //资源路径
+                                }
+                            ]
+                        },
+                        {
+                            "plid": 2,
+                            "online_time": "12:00:00",
+                            "offline_time": "24:00:00",
+                            "type": 1,
+                            music_list: [
+                                {
+                                    "mid": 504,
+                                    "name": "Ayleth's Song.mp3",
+                                    "path": "http://file.echomelody.com/music/20160408/absolute music/light music/Ayleth's Song.mp3" //资源路径
+                                },
+                                {
+                                    "mid": 503,
+                                    "name": "Atmospheric Christmas.mp3",
+                                    "path": "http://file.echomelody.com/music/20160408/absolute music/Christmas music/Atmospheric Christmas.mp3" //资源路径
+                                }
+                            ]
+                        }
+                    ]
                 }
             };
-            return result;
+        });
+    }
+    /**
+     * 获取音乐播放计划
+     */
+    playlists() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                let result = yield this._playSchedule();
+                return result.data.playlist;
+            }
+            catch (e) {
+                return [];
+            }
         });
     }
     /**
