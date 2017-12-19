@@ -50,7 +50,7 @@ class MusicPlayer {
 
         document.addEventListener("online", () => {
             this.updatePlayLists();
-            
+
         }, false);
 
     }
@@ -428,21 +428,6 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
 
         }, 1000 * 1);
 
-        // var networkState = navigator.connection.type;
-        // while (networkState == Connection.NONE) {
-        //     let timeid = setTimeout(() => {
-        //         EPlayer.setWifiFromUsb(
-        //             (isSuccess) => {
-        //                 if (isSuccess) {
-        //                     this.props.player.updatePlayLists();
-        //                 }
-        //             }
-        //         );
-        //         clearTimeout(timeid);
-
-        //     }, 1000 * 15);
-        // }
-
     }
 
     toggleInfo() {
@@ -521,7 +506,6 @@ class Application {
                 (entry: DirectoryEntry) => {
                     entry.getDirectory('musics1', { create: true },
                         entry => {
-                            // entry.remove(()=>{});
                             resolve(entry);
                         },
                         err => {
@@ -585,7 +569,27 @@ class EPlayer {
             }, this.serviceName, 'setWifiFromUsb'
         );
     }
-
+    static macAddress() {
+        return new Promise<string>((resolve, reject) => {
+            let value = localStorage.getItem('macAddress');
+            if (value) {
+                resolve(value);
+                return;
+            }
+            cordova.exec(
+                (macAddress: string) => {
+                    if (macAddress) {
+                        localStorage.setItem('macAddress', macAddress);
+                    }
+                    resolve(macAddress);
+                },
+                err => {
+                    reject(err);
+                },
+                this.serviceName, 'macAddress'
+            )
+        })
+    }
 }
 
 

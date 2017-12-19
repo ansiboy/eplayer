@@ -3,8 +3,11 @@ package io.cordova.hellocordova;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiConfiguration;
+import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.StatFs;
 import android.os.storage.StorageManager;
@@ -80,11 +83,26 @@ public class EPlayer extends CordovaPlugin {
         } else if (action.equals("setWifiFromUsb")) {
             setWifiFromUsb(cordova.getActivity());
         }
+        else if(action.equals("macAddress")){
+            macAddress(callbackContext);
+        }
         return false;
     }
 
-    public static void playStartSound(Context context){
-        playSound(SOUND_SUCCESS,context);
+    void macAddress(CallbackContext callbackContext) {
+        Context context = cordova.getActivity();
+        WifiManager cm = (WifiManager) context
+                .getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = null;
+        if (cm != null)
+            info = cm.getConnectionInfo();
+
+        String macAddress = info != null ? info.getMacAddress() : "";
+        callbackContext.success(macAddress);
+    }
+
+    public static void playStartSound(Context context) {
+        playSound(SOUND_SUCCESS, context);
     }
 
     private void reboot() {
@@ -113,7 +131,7 @@ public class EPlayer extends CordovaPlugin {
     static void setWifiFromUsb(Context context) {
         JSONObject config = scandWifiConfig(context);
         if (config == null) {
-            playSound(SOUND_CONFIG_ERROR,context);
+            playSound(SOUND_CONFIG_ERROR, context);
             return;
         }
 
@@ -121,20 +139,20 @@ public class EPlayer extends CordovaPlugin {
             String ssid = config.getString("ssid");
             String password = config.getString("password");
 
-            boolean setWifiSuccess = setWifi(ssid, password,context);
+            boolean setWifiSuccess = setWifi(ssid, password, context);
             if (!setWifiSuccess) {
-                playSound(SOUND_NETWORK_ERROR,context);
+                playSound(SOUND_NETWORK_ERROR, context);
                 return;
             }
-            playSound(SOUND_SUCCESS,context);
+            playSound(SOUND_SUCCESS, context);
 
         } catch (JSONException e) {
-            playSound(SOUND_CONFIG_ERROR,context);
+            playSound(SOUND_CONFIG_ERROR, context);
             e.printStackTrace();
         }
     }
 
-    private static boolean setWifi(String ssid, String password,Context context) {
+    private static boolean setWifi(String ssid, String password, Context context) {
 //        Context context = cordova.getActivity().getApplicationContext();
         WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
@@ -224,11 +242,7 @@ public class EPlayer extends CordovaPlugin {
         return fileData.toString();
     }
 
-    private void playSound(int code) {
-        playSound(code,cordova.getActivity());
-    }
-
-    private static void playSound(int code,Context context) {
+    private static void playSound(int code, Context context) {
         Uri alert = null;// = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
         if (code == SOUND_SUCCESS) {
             alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
