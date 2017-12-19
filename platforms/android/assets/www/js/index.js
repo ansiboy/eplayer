@@ -20,7 +20,6 @@ class MusicPlayer {
     start() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.updatePlayLists();
-            // this.play();
             this.downloadScheduleMusic(this.playlists);
             let second = 1000;
             let minute = second * 60;
@@ -28,6 +27,8 @@ class MusicPlayer {
                 yield this.updatePlayLists();
                 this.downloadScheduleMusic(this.playlists);
             }), minute * 30);
+            //===============================================================
+            // 每隔 5 秒检查播放列表，如果在时间段内，进行播放
             setInterval(() => __awaiter(this, void 0, void 0, function* () {
                 if (this.currentPlayList != null)
                     return;
@@ -42,6 +43,7 @@ class MusicPlayer {
                     }
                 }
             }), 1000 * 5);
+            //===============================================================
         });
     }
     parseTime(time) {
@@ -198,17 +200,7 @@ class MusicPlayer {
     }
     updatePlayLists() {
         return __awaiter(this, void 0, void 0, function* () {
-            // try {
             let service = new Service();
-            // let result = await service.playSchedule();
-            // if (result.code == CodeSuccess)
-            //     this.playlists = result.data.playlist;
-            // else
-            //     this.playlists = [];
-            // }
-            // finally {
-            //     return this.playlists;
-            // }
             this.playlists = yield service.playlists();
         });
     }
@@ -280,6 +272,8 @@ class MusicPlayer {
 class MusicPage extends React.Component {
     constructor(props) {
         super(props);
+        this.rebootDurationDays = 7;
+        this.rebootHour = 5;
         this.state = { musics: [], current: 0, title: "", info: "", infos: [], showAllInfos: false };
         this.startTime = Date.now();
     }
@@ -300,7 +294,6 @@ class MusicPage extends React.Component {
         this.state.infos[0] = { name: `磁盘空间` };
         this.state.infos[1] = { name: `重启时间` };
         this.state.infos[2] = { name: `已下载音乐` };
-        // var eplayer = new EPlayer();
         EPlayer.freeSpace(this.props.player.musicDirectory).then(obj => {
             this.state.infos[0].value = `总容量:${Math.floor(obj.total / 1024)}M 剩余:${Math.floor(obj.free / 1024)}M`;
             this.setState(this.state);
@@ -316,6 +309,9 @@ class MusicPage extends React.Component {
             if (music != null) {
                 this.state.title = music.name;
             }
+            let now = new Date(Date.now());
+            //==========================================================
+            // 系统运行时间
             let runDuration = Date.now() - this.startTime;
             let seconds = Math.floor((runDuration / 1000));
             let minutes = 0;
@@ -334,15 +330,41 @@ class MusicPage extends React.Component {
                 hours = hours % 24;
             }
             this.state.info = `系统已经运行${days}天${hours}小时${minutes}分${seconds}秒`;
+            //==========================================================
+            //==========================================================
+            this.state.infos[1].value = `${this.rebootDurationDays - days}天后${this.rebootHour}点重启`;
+            if (days >= this.rebootDurationDays && now.getHours() == this.rebootHour) {
+                EPlayer.reboot();
+            }
+            //==========================================================
             this.setState(this.state);
         }, 1000 * 1);
-        var networkState = navigator.connection.type;
-        while (networkState == Connection.NONE) {
-            let timeid = setTimeout(() => {
-                EPlayer.setWifiFromUsb();
-                clearTimeout(timeid);
-            }, 2000);
+        // var networkState = navigator.connection.type;
+        // while (networkState == Connection.NONE) {
+        //     let timeid = setTimeout(() => {
+        //         EPlayer.setWifiFromUsb(
+        //             (isSuccess) => {
+        //                 if (isSuccess) {
+        //                     this.props.player.updatePlayLists();
+        //                 }
+        //             }
+        //         );
+        //         clearTimeout(timeid);
+        //     }, 1000 * 15);
+        // }
+    }
+    toggleInfo() {
+        this.state.showAllInfos = !this.state.showAllInfos;
+        if (this.state.showAllInfos) {
+            window.resolveLocalFileSystemURL(this.props.player.musicDirectory, (entry) => {
+                let reader = entry.createReader();
+                reader.readEntries((entires) => {
+                    this.state.infos[2].value = `${entires.length}首`;
+                    this.setState(this.state);
+                });
+            });
         }
+        this.setState(this.state);
     }
     render() {
         let musics = this.state.musics;
@@ -351,7 +373,9 @@ class MusicPage extends React.Component {
         let music = this.props.player.currentMusic;
         return [
             React.createElement("div", { key: "title", className: "title", onClick: () => {
-                    EPlayer.reboot();
+                    var b = confirm("测试：点击确认按钮重启");
+                    if (b)
+                        EPlayer.reboot();
                 } }, title),
             React.createElement("div", { key: "musics", className: "music-list" }, musics.map((o, i) => (React.createElement("div", { key: o.mid, className: i == current ? "music-name active" : "music-name" },
                 o.name,
@@ -365,8 +389,7 @@ class MusicPage extends React.Component {
                             });
                         } }) : null)))),
             React.createElement("div", { key: "infos", className: "infos", onClick: () => {
-                    this.state.showAllInfos = !this.state.showAllInfos;
-                    this.setState(this.state);
+                    this.toggleInfo();
                 } },
                 showAllInfos ? infos.map((o, i) => React.createElement("div", { className: "item", key: i },
                     React.createElement("div", { style: { float: 'right' } }, o.value),
@@ -424,8 +447,9 @@ class EPlayer {
             }, this.serviceName, "freeSpace", [dir]);
         });
     }
-    static setWifiFromUsb() {
-        cordova.exec(() => {
+    static setWifiFromUsb(callback) {
+        cordova.exec((isSuccess) => {
+            callback(isSuccess);
         }, () => {
         }, this.serviceName, 'setWifiFromUsb');
     }

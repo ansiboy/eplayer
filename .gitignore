@@ -1,9 +1,14 @@
 platforms/android/.gradle
 platforms/android/.idea
 platforms/android/.idea/*.xml
+platforms/android/.idea/workspace.xml
+platforms/android/.idea/misc.xml
 build
 node_modules
 platforms/android/cordova/node_modules
 platforms/android/assets
 platforms/android/CordovaLib/.classpath
 platforms/android/*.iml
+platforms/android/android.iml
+plugins/cordova-hot-code-push-local-dev-addon/.build_config
+platforms/android/CordovaLib/CordovaLib.iml
