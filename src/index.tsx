@@ -48,6 +48,11 @@ class MusicPlayer {
         }, 1000 * 5);
         //===============================================================
 
+        document.addEventListener("online", () => {
+            this.updatePlayLists();
+            
+        }, false);
+
     }
 
     private parseTime(time: string) {
@@ -437,6 +442,7 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
 
         //     }, 1000 * 15);
         // }
+
     }
 
     toggleInfo() {
