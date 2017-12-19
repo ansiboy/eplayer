@@ -25,7 +25,7 @@ class Service {
                     playlist: [
                         {
                             "plid": 1,
-                            "online_time": "08:00:00",
+                            "online_time": "00:00:00",
                             "offline_time": "12:00:00",
                             "type": 0,
                             music_list: [

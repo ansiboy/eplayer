@@ -56,19 +56,22 @@ body {
     padding-left: 0px;
     padding-right: 0px;
     min-height: 16px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.info {
+.infos {
     position: fixed;
     bottom: 0;
     width: 100%;
-    /* height: 30px; */
-    padding-top: 10px;
     text-align: left;
     color: white;
     background-color:rgb(8, 138, 19);
-    padding: 8px 10px 8px 10px;
     min-height: 16px;
+}
+
+.infos .item {
+    padding: 8px 10px 10px 10px;
 }
 
 .music-list {

@@ -341,12 +341,15 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
     { musics: MusicItem[], current: number, title: string, info: string, infos: { name: string, value?: string }[], showAllInfos: boolean }> {
 
     private startTime: number;
+    private rebootDurationDays: number = 7;
+    private rebootHour = 5;
 
     constructor(props) {
         super(props);
 
         this.state = { musics: [], current: 0, title: "", info: "", infos: [], showAllInfos: false };
         this.startTime = Date.now();
+        
     }
 
     private parseTime(time: string) {
@@ -371,8 +374,8 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
         this.state.infos[1] = { name: `重启时间` };
         this.state.infos[2] = { name: `已下载音乐` };
 
-        var eplayer = new EPlayer();
-        eplayer.freeSpace(this.props.player.musicDirectory).then(obj => {
+        // var eplayer = new EPlayer();
+        EPlayer.freeSpace(this.props.player.musicDirectory).then(obj => {
 
             this.state.infos[0].value = `总容量:${Math.floor(obj.total / 1024)}M 剩余:${Math.floor(obj.free / 1024)}M`;
             this.setState(this.state);
@@ -392,6 +395,9 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
             }
 
 
+            let now = new Date(Date.now());
+            //==========================================================
+            // 系统运行时间
             let runDuration = Date.now() - this.startTime;
             let seconds = Math.floor((runDuration / 1000));
             let minutes = 0;
@@ -410,14 +416,34 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
                 hours = hours % 24;
             }
 
-
             this.state.info = `系统已经运行${days}天${hours}小时${minutes}分${seconds}秒`;
+            //==========================================================
+
+            //==========================================================
+
+            this.state.infos[1].value = `${this.rebootDurationDays - days}天后${this.rebootHour}点重启`;
+            if (days >= this.rebootDurationDays && now.getHours() == this.rebootHour) {
+                EPlayer.reboot();
+            }
+            //==========================================================
 
             this.setState(this.state);
 
 
         }, 1000 * 1);
+
+        var networkState = navigator.connection.type;
+        while (networkState == Connection.NONE) {
+            let timeid = setTimeout(() => {
+
+                EPlayer.setWifiFromUsb();
+                clearTimeout(timeid);
+
+            }, 2000);
+        }
     }
+
+
 
     render() {
         let musics = this.state.musics;
@@ -425,10 +451,13 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
         let { title, info, showAllInfos, infos } = this.state;
         let music = this.props.player.currentMusic;
         return [
-            <div key="title" className="title">
+            <div key="title" className="title"
+                onClick={() => {
+                    EPlayer.reboot();
+                }}>
                 {title}
             </div>,
-            <div key="musics" className="music-list">
+            <div key="musics" className="music-list" >
                 {musics.map((o, i) => (
                     <div key={o.mid} className={i == current ? "music-name active" : "music-name"}>
                         {o.name} {i == current && music != null ?
@@ -500,11 +529,11 @@ class Application {
 }
 
 class EPlayer {
-    private serviceName = "EPlayer";
+    private static serviceName = "EPlayer";
     private execute() {
 
     }
-    reboot() {
+    static reboot() {
         cordova.exec(
             () => {
                 debugger
@@ -514,7 +543,7 @@ class EPlayer {
             }, this.serviceName, "reboot"
         );
     }
-    freeSpace(dir: string) {
+    static freeSpace(dir: string) {
         if (dir.startsWith('file://')) {
             dir = dir.substr('file://'.length);
         }
@@ -529,6 +558,17 @@ class EPlayer {
             )
         })
     }
+    static setWifiFromUsb() {
+        cordova.exec(
+            () => {
+
+            },
+            () => {
+
+            }, this.serviceName, 'setWifiFromUsb'
+        );
+    }
+
 }
 
 

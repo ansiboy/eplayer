@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <widget id="io.cordova.hellocordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-  <feature name="Whitelist">
-    <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin"/>
+  <feature name="HotCodePushLocalDevMode">
+    <param name="android-package" value="com.nordnetab.chcp.localdev.HotCodePushLocalDevPlugin"/>
     <param name="onload" value="true"/>
   </feature>
   <feature name="HotCodePush">
     <param name="android-package" value="com.nordnetab.chcp.main.HotCodePushPlugin"/>
-    <param name="onload" value="true"/>
-  </feature>
-  <feature name="HotCodePushLocalDevMode">
-    <param name="android-package" value="com.nordnetab.chcp.localdev.HotCodePushLocalDevPlugin"/>
     <param name="onload" value="true"/>
   </feature>
   <feature name="File">
@@ -21,6 +17,13 @@
   </feature>
   <feature name="Media">
     <param name="android-package" value="org.apache.cordova.media.AudioHandler"/>
+  </feature>
+  <feature name="NetworkStatus">
+    <param name="android-package" value="org.apache.cordova.networkinformation.NetworkManager"/>
+  </feature>
+  <feature name="Whitelist">
+    <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin"/>
+    <param name="onload" value="true"/>
   </feature>
   <feature name="EPlayer">
     <param name="android-package" value="io.cordova.hellocordova.EPlayer"/>
@@ -50,6 +53,6 @@
   <preference name="loadUrlTimeoutValue" value="60000"/>
   <chcp>
     <local-development enabled="true"/>
-    <config-file url="https://4154ebc5.ngrok.io/chcp.json"/>
+    <config-file url="https://8f864fcb.ngrok.io/chcp.json"/>
   </chcp>
 </widget>

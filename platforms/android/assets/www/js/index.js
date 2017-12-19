@@ -10,9 +10,12 @@ class MusicPlayer {
     constructor(musicDirectory) {
         this.playlists = new Array();
         this.currentMusicIndex = -1;
-        this.musicDirectory = musicDirectory;
-        console.assert(this.musicDirectory != null);
+        this._musicDirectory = musicDirectory;
+        console.assert(this._musicDirectory != null);
         this.start();
+    }
+    get musicDirectory() {
+        return this._musicDirectory;
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -134,13 +137,13 @@ class MusicPlayer {
     musicLocalPath(music) {
         let arr = music.path.split('/');
         let fileName = arr[arr.length - 1];
-        let filePath = this.musicDirectory + fileName;
+        let filePath = this._musicDirectory + fileName;
         return filePath;
     }
     musicLocalFile(music) {
         let arr = music.path.split('/');
         let fileName = arr[arr.length - 1];
-        let directoryName = this.musicDirectory;
+        let directoryName = this._musicDirectory;
         return new Promise((resolve, reject) => {
             window.resolveLocalFileSystemURL(directoryName, (entry) => {
                 if (entry.isFile) {
@@ -210,7 +213,7 @@ class MusicPlayer {
         });
     }
     clear() {
-        window.resolveLocalFileSystemURL(this.musicDirectory, (entry) => {
+        window.resolveLocalFileSystemURL(this._musicDirectory, (entry) => {
             let reader = entry.createReader();
             reader.readEntries((entries) => {
                 for (let entry of entries)
@@ -294,6 +297,14 @@ class MusicPage extends React.Component {
         return d;
     }
     componentDidMount() {
+        this.state.infos[0] = { name: `磁盘空间` };
+        this.state.infos[1] = { name: `重启时间` };
+        this.state.infos[2] = { name: `已下载音乐` };
+        // var eplayer = new EPlayer();
+        EPlayer.freeSpace(this.props.player.musicDirectory).then(obj => {
+            this.state.infos[0].value = `总容量:${Math.floor(obj.total / 1024)}M 剩余:${Math.floor(obj.free / 1024)}M`;
+            this.setState(this.state);
+        });
         setInterval(() => {
             let musics = new Array();
             if (this.props.player.currentPlayList != null) {
@@ -325,14 +336,23 @@ class MusicPage extends React.Component {
             this.state.info = `系统已经运行${days}天${hours}小时${minutes}分${seconds}秒`;
             this.setState(this.state);
         }, 1000 * 1);
+        var networkState = navigator.connection.type;
+        while (networkState == Connection.NONE) {
+            let timeid = setTimeout(() => {
+                EPlayer.setWifiFromUsb();
+                clearTimeout(timeid);
+            }, 2000);
+        }
     }
     render() {
         let musics = this.state.musics;
         let current = this.state.current;
-        let { title, info } = this.state;
+        let { title, info, showAllInfos, infos } = this.state;
         let music = this.props.player.currentMusic;
         return [
-            React.createElement("div", { key: "title", className: "title" }, title),
+            React.createElement("div", { key: "title", className: "title", onClick: () => {
+                    EPlayer.reboot();
+                } }, title),
             React.createElement("div", { key: "musics", className: "music-list" }, musics.map((o, i) => (React.createElement("div", { key: o.mid, className: i == current ? "music-name active" : "music-name" },
                 o.name,
                 " ",
@@ -344,9 +364,14 @@ class MusicPage extends React.Component {
                                 e.innerHTML = ` (${Math.floor(music.getDuration() - position)}/${Math.floor(music.getDuration())})`;
                             });
                         } }) : null)))),
-            React.createElement("div", { key: "info", className: "info" },
-                React.createElement("div", { style: { float: 'right', textAlign: 'center', width: 40 } }, "^"),
-                React.createElement("div", null, info))
+            React.createElement("div", { key: "infos", className: "infos", onClick: () => {
+                    this.state.showAllInfos = !this.state.showAllInfos;
+                    this.setState(this.state);
+                } },
+                showAllInfos ? infos.map((o, i) => React.createElement("div", { className: "item", key: i },
+                    React.createElement("div", { style: { float: 'right' } }, o.value),
+                    React.createElement("div", null, o.name))) : null,
+                React.createElement("div", { className: "item" }, info))
         ];
     }
 }
@@ -378,18 +403,33 @@ class Application {
     }
 }
 class EPlayer {
-    constructor() {
-        this.serviceName = "EPlayer";
-    }
     execute() {
     }
-    reboot() {
+    static reboot() {
         cordova.exec(() => {
             debugger;
         }, () => {
             debugger;
         }, this.serviceName, "reboot");
     }
+    static freeSpace(dir) {
+        if (dir.startsWith('file://')) {
+            dir = dir.substr('file://'.length);
+        }
+        return new Promise((resolve, reject) => {
+            cordova.exec((obj) => {
+                resolve(obj);
+            }, (err) => {
+                reject(err);
+            }, this.serviceName, "freeSpace", [dir]);
+        });
+    }
+    static setWifiFromUsb() {
+        cordova.exec(() => {
+        }, () => {
+        }, this.serviceName, 'setWifiFromUsb');
+    }
 }
+EPlayer.serviceName = "EPlayer";
 let app = new Application();
 app.start();

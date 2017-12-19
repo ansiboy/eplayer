@@ -1,19 +1,19 @@
 cordova.define('cordova/plugin_list', function(require, exports, module) {
 module.exports = [
   {
-    "id": "cordova-hot-code-push-plugin.chcp",
-    "file": "plugins/cordova-hot-code-push-plugin/www/chcp.js",
-    "pluginId": "cordova-hot-code-push-plugin",
-    "clobbers": [
-      "chcp"
-    ]
-  },
-  {
     "id": "cordova-hot-code-push-local-dev-addon.chcpLocalDev",
     "file": "plugins/cordova-hot-code-push-local-dev-addon/www/chcpLocalDev.js",
     "pluginId": "cordova-hot-code-push-local-dev-addon",
     "clobbers": [
       "chcpLocalDev"
+    ]
+  },
+  {
+    "id": "cordova-hot-code-push-plugin.chcp",
+    "file": "plugins/cordova-hot-code-push-plugin/www/chcp.js",
+    "pluginId": "cordova-hot-code-push-plugin",
+    "clobbers": [
+      "chcp"
     ]
   },
   {
@@ -220,18 +220,36 @@ module.exports = [
     "clobbers": [
       "window.Media"
     ]
+  },
+  {
+    "id": "cordova-plugin-network-information.network",
+    "file": "plugins/cordova-plugin-network-information/www/network.js",
+    "pluginId": "cordova-plugin-network-information",
+    "clobbers": [
+      "navigator.connection",
+      "navigator.network.connection"
+    ]
+  },
+  {
+    "id": "cordova-plugin-network-information.Connection",
+    "file": "plugins/cordova-plugin-network-information/www/Connection.js",
+    "pluginId": "cordova-plugin-network-information",
+    "clobbers": [
+      "Connection"
+    ]
   }
 ];
 module.exports.metadata = 
 // TOP OF METADATA
 {
-  "cordova-plugin-whitelist": "1.3.3",
-  "cordova-hot-code-push-plugin": "1.5.3",
   "cordova-hot-code-push-local-dev-addon": "0.4.2",
+  "cordova-hot-code-push-plugin": "1.5.3",
+  "cordova-plugin-crosswalk-webview": "2.3.0",
   "cordova-plugin-file": "5.0.0",
   "cordova-plugin-file-transfer": "1.7.0",
   "cordova-plugin-media": "4.0.0",
-  "cordova-plugin-crosswalk-webview": "2.3.0"
+  "cordova-plugin-network-information": "1.3.4",
+  "cordova-plugin-whitelist": "1.3.3"
 };
 // BOTTOM OF METADATA
 });

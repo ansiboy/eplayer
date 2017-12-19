@@ -76,54 +76,54 @@ public class MainActivity extends CordovaActivity {
         loadUrl(launchUrl);
 
 
-        //应用运行时，保持屏幕高亮，不锁屏
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//        //应用运行时，保持屏幕高亮，不锁屏
+//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+//
+//        // 音量最大化
+//        setMaxVolume();
 
-        // 音量最大化
-        setMaxVolume();
-
-        // 设置网络
-        if (!isNetworkAvailable()) {
-            JSONObject config = scandWifiConfig();
-            if (config == null) {
-                this.playSound(SOUND_CONFIG_ERROR);
-                return;
-            }
-
-            try {
-                String ssid = config.getString("ssid");
-                String password = config.getString("password");
-
-                boolean setWifiSuccess = this.setWifi(ssid, password);
-                if (!setWifiSuccess) {
-                    this.playSound(SOUND_NETWORK_ERROR);
-                    return;
-                }
-
-            } catch (JSONException e) {
-                this.playSound(SOUND_CONFIG_ERROR);
-                e.printStackTrace();
-            }
-        }
-
-        this.playSound(SOUND_SUCCESS);
+//        // 设置网络
+//        if (!isNetworkAvailable()) {
+//            JSONObject config = scandWifiConfig();
+//            if (config == null) {
+//                this.playSound(SOUND_CONFIG_ERROR);
+//                return;
+//            }
+//
+//            try {
+//                String ssid = config.getString("ssid");
+//                String password = config.getString("password");
+//
+//                boolean setWifiSuccess = this.setWifi(ssid, password);
+//                if (!setWifiSuccess) {
+//                    this.playSound(SOUND_NETWORK_ERROR);
+//                    return;
+//                }
+//
+//            } catch (JSONException e) {
+//                this.playSound(SOUND_CONFIG_ERROR);
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        this.playSound(SOUND_SUCCESS);
 
 
 
         //=========================================
         // 定时重启
-        int SECOND = 1000;
-        int MINUTE = SECOND * 60;
-        int HOUR = MINUTE * 60;
-        int DAY = HOUR * 24;
-        Timer timer = new Timer();
-        TimerTask task = new TimerTask() {
-            @Override
-            public void run() {
-                reboot();
-            }
-        };
-        timer.schedule(task, DAY * 7);
+//        int SECOND = 1000;
+//        int MINUTE = SECOND * 60;
+//        int HOUR = MINUTE * 60;
+//        int DAY = HOUR * 24;
+//        Timer timer = new Timer();
+//        TimerTask task = new TimerTask() {
+//            @Override
+//            public void run() {
+//                reboot();
+//            }
+//        };
+//        timer.schedule(task, DAY * 7);
         //=========================================
     }
 
