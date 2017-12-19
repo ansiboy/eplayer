@@ -47,6 +47,7 @@ public class EPlayer extends CordovaPlugin {
 
         super.initialize(cordova, webView);
 
+
         //=======================================================================
         // Request Root Permission
         String apkRoot = "chmod 777 " + cordova.getActivity().getPackageCodePath();
@@ -77,9 +78,13 @@ public class EPlayer extends CordovaPlugin {
             this.freeSpace(args.getString(0), callbackContext);
 
         } else if (action.equals("setWifiFromUsb")) {
-            this.setWifiFromUsb();
+            setWifiFromUsb(cordova.getActivity());
         }
         return false;
+    }
+
+    public static void playStartSound(Context context){
+        playSound(SOUND_START,context);
     }
 
     private void reboot() {
@@ -96,20 +101,19 @@ public class EPlayer extends CordovaPlugin {
         int blockCount = sf.getBlockCount();
         int availCount = sf.getAvailableBlocks();
         JSONObject obj = new JSONObject();
-//        availCount * blockSize / 1024,blockCount*blockSize / 1024
         obj.put("free", availCount * blockSize / 1024);
         obj.put("total", blockCount * blockSize / 1024);
         callbackContext.success(obj);
     }
 
-    private int SOUND_SUCCESS = 1;
-    private int SOUND_NETWORK_ERROR = 2;
-    private int SOUND_CONFIG_ERROR = 3;
+    private static int SOUND_START = 1;
+    private static int SOUND_NETWORK_ERROR = 2;
+    private static int SOUND_CONFIG_ERROR = 3;
 
-    private void setWifiFromUsb() {
-        JSONObject config = scandWifiConfig();
+    static void setWifiFromUsb(Context context) {
+        JSONObject config = scandWifiConfig(context);
         if (config == null) {
-            this.playSound(SOUND_CONFIG_ERROR);
+            playSound(SOUND_CONFIG_ERROR,context);
             return;
         }
 
@@ -117,20 +121,20 @@ public class EPlayer extends CordovaPlugin {
             String ssid = config.getString("ssid");
             String password = config.getString("password");
 
-            boolean setWifiSuccess = this.setWifi(ssid, password);
+            boolean setWifiSuccess = setWifi(ssid, password,context);
             if (!setWifiSuccess) {
-                this.playSound(SOUND_NETWORK_ERROR);
+                playSound(SOUND_NETWORK_ERROR,context);
                 return;
             }
 
         } catch (JSONException e) {
-            this.playSound(SOUND_CONFIG_ERROR);
+            playSound(SOUND_CONFIG_ERROR,context);
             e.printStackTrace();
         }
     }
 
-    private boolean setWifi(String ssid, String password) {
-        Context context = cordova.getActivity().getApplicationContext();
+    private static boolean setWifi(String ssid, String password,Context context) {
+//        Context context = cordova.getActivity().getApplicationContext();
         WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
 
         if (!wm.isWifiEnabled()) {
@@ -157,8 +161,8 @@ public class EPlayer extends CordovaPlugin {
         return b;
     }
 
-    JSONObject scandWifiConfig() {
-        StorageManager storageManager = (StorageManager) cordova.getActivity().getSystemService(Context.STORAGE_SERVICE);
+    private static JSONObject scandWifiConfig(Context context) {
+        StorageManager storageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
 
         Class<?>[] paramClasses = {};
         try {
@@ -219,9 +223,13 @@ public class EPlayer extends CordovaPlugin {
         return fileData.toString();
     }
 
-    void playSound(final int code) {
+    private void playSound(int code) {
+        playSound(code,cordova.getActivity());
+    }
+
+    private static void playSound(int code,Context context) {
         Uri alert = null;// = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        if (code == SOUND_SUCCESS) {
+        if (code == SOUND_START) {
             alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         } else if (code == SOUND_CONFIG_ERROR) {
             alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
@@ -234,7 +242,7 @@ public class EPlayer extends CordovaPlugin {
 
         final MediaPlayer player = new MediaPlayer();
         try {
-            player.setDataSource(cordova.getActivity(), alert);
+            player.setDataSource(context, alert);
             player.prepare();
             player.start();
 

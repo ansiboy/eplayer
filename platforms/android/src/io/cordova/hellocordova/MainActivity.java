@@ -76,55 +76,26 @@ public class MainActivity extends CordovaActivity {
         loadUrl(launchUrl);
 
 
-//        //应用运行时，保持屏幕高亮，不锁屏
-//        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-//
-//        // 音量最大化
-//        setMaxVolume();
+        //应用运行时，保持屏幕高亮，不锁屏
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-//        // 设置网络
-//        if (!isNetworkAvailable()) {
-//            JSONObject config = scandWifiConfig();
-//            if (config == null) {
-//                this.playSound(SOUND_CONFIG_ERROR);
-//                return;
-//            }
-//
-//            try {
-//                String ssid = config.getString("ssid");
-//                String password = config.getString("password");
-//
-//                boolean setWifiSuccess = this.setWifi(ssid, password);
-//                if (!setWifiSuccess) {
-//                    this.playSound(SOUND_NETWORK_ERROR);
-//                    return;
-//                }
-//
-//            } catch (JSONException e) {
-//                this.playSound(SOUND_CONFIG_ERROR);
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        this.playSound(SOUND_SUCCESS);
+        // 音量最大化
+        setMaxVolume();
 
+        if (!isNetworkAvailable()) {
+            EPlayer.setWifiFromUsb(this);
+        }
 
+        EPlayer.playStartSound(this);
+    }
 
-        //=========================================
-        // 定时重启
-//        int SECOND = 1000;
-//        int MINUTE = SECOND * 60;
-//        int HOUR = MINUTE * 60;
-//        int DAY = HOUR * 24;
-//        Timer timer = new Timer();
-//        TimerTask task = new TimerTask() {
-//            @Override
-//            public void run() {
-//                reboot();
-//            }
-//        };
-//        timer.schedule(task, DAY * 7);
-        //=========================================
+    boolean isNetworkAvailable() {
+        Context context = this.getApplicationContext();
+        ConnectivityManager cm = (ConnectivityManager) context
+                .getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo info = cm.getActiveNetworkInfo();
+        return info != null && info.isConnected();
     }
 
     /**
@@ -138,200 +109,6 @@ public class MainActivity extends CordovaActivity {
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, AudioManager.FLAG_SHOW_UI);
         //=======================================================================================
     }
-
-    JSONObject scandWifiConfig() {
-        StorageManager storageManager = (StorageManager) this.getSystemService(Context.STORAGE_SERVICE);
-
-        Class<?>[] paramClasses = {};
-        try {
-            Method getVolumeList = StorageManager.class.getMethod("getVolumeList", paramClasses);
-            getVolumeList.setAccessible(true);
-            Object[] params = {};
-            Object[] invokes = (Object[]) getVolumeList.invoke(storageManager, params);
-            if (invokes == null)
-                return null;
-
-            for (int i = 0; i < invokes.length; i++) {
-                Object obj = invokes[i];
-                Method getPath = obj.getClass().getMethod("getPath");
-                String path = (String) getPath.invoke(obj);
-                File file = new File(path);
-                boolean canRead = file.canRead();
-                if (file.exists() && file.isDirectory() && canRead) {
-
-                    File[] files = file.listFiles();
-                    for (int j = 0; j < files.length; j++) {
-                        String fileName = files[j].getName();
-                        if (files[j].isFile() && fileName.equals("wifi-config.json")) {
-                            String json = readFileAsString(files[j]);
-                            JSONObject jObject = new JSONObject(json);
-                            return jObject;
-                        }
-                    }
-                }
-            }
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private static String readFileAsString(File file)
-            throws java.io.IOException {
-        StringBuffer fileData = new StringBuffer(1000);
-        BufferedReader reader = new BufferedReader(
-                new FileReader(file));
-        char[] buf = new char[1024];
-        int numRead = 0;
-        while ((numRead = reader.read(buf)) != -1) {
-            String readData = String.valueOf(buf, 0, numRead);
-            fileData.append(readData);
-            buf = new char[1024];
-        }
-        reader.close();
-        return fileData.toString();
-    }
-
-
-    void playSound(final int code) {
-        Uri alert = null;// = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        if(code == SOUND_SUCCESS){
-            alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        }
-        else if(code == SOUND_CONFIG_ERROR){
-            alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        }
-        else if(code == SOUND_NETWORK_ERROR){
-            alert= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-        }
-        else {
-            alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALL);
-        }
-
-
-        final MediaPlayer player = new MediaPlayer();
-        try {
-            player.setDataSource(this, alert);
-            player.prepare();
-            player.start();
-
-            Timer timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    player.stop();
-                }
-            },8000);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void reboot() {
-        String apkRoot = "chmod 777 " + getPackageCodePath();
-        RootCommand(apkRoot);
-        try {
-            Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot"});
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 应用程序运行命令获取 Root权限，设备必须已破解(获得ROOT权限)
-     *
-     * @param command 命令：String apkRoot="chmod 777 "+getPackageCodePath(); RootCommand(apkRoot);
-     * @return 应用程序是/否获取Root权限
-     */
-    public static boolean RootCommand(String command) {
-        Process process = null;
-        DataOutputStream os = null;
-        try {
-            process = Runtime.getRuntime().exec("su");
-            os = new DataOutputStream(process.getOutputStream());
-            os.writeBytes(command + "\n");
-            os.writeBytes("exit\n");
-            os.flush();
-            process.waitFor();
-        } catch (Exception e) {
-            Log.d("*** DEBUG ***", "ROOT REE" + e.getMessage());
-            return false;
-        } finally {
-            try {
-                if (os != null) {
-                    os.close();
-                }
-                process.destroy();
-            } catch (Exception ignored) {
-            }
-        }
-        Log.d("*** DEBUG ***", "Root SUC ");
-        return true;
-    }
-
-    boolean isNetworkAvailable() {
-        Context context = this.getApplicationContext();
-        ConnectivityManager cm = (ConnectivityManager) context
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-
-        NetworkInfo info = cm.getActiveNetworkInfo();
-        return info != null && info.isConnected();
-    }
-
-    private boolean setWifi(String ssid, String password) {
-        Context context = this.getApplicationContext();
-        WifiManager wm = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-
-        if (!wm.isWifiEnabled()) {
-            wm.setWifiEnabled(true);
-        }
-
-        WifiConfiguration wifiConfig = new WifiConfiguration();
-        wifiConfig.SSID = "\"" + ssid + "\"";
-        wifiConfig.preSharedKey = "\"" + password + "\"";
-        wifiConfig.hiddenSSID = true;
-        wifiConfig.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
-        wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
-        wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
-        wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.TKIP);
-        wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.CCMP);
-        wifiConfig.allowedPairwiseCiphers.set(WifiConfiguration.PairwiseCipher.CCMP);
-        wifiConfig.status = WifiConfiguration.Status.ENABLED;
-
-        int wcgID = wm.addNetwork(wifiConfig);
-        boolean b = wm.enableNetwork(wcgID, true);
-        System.out.println("a--" + wcgID);
-        System.out.println("b--" + b);
-
-        return b;
-    }
-
-//    @Override
-//    protected void onResume() {
-//        super.onResume();
-//        wakeLock = ((PowerManager) getSystemService(POWER_SERVICE))
-//                .newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK
-//                        | PowerManager.ON_AFTER_RELEASE, TAG);
-//        wakeLock.acquire();
-//    }
-//
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        if (wakeLock != null) {
-//            wakeLock.release();
-//        }
-//    }
 }
 
 

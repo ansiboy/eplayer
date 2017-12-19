@@ -20,7 +20,6 @@ class MusicPlayer {
 
     private async start() {
         await this.updatePlayLists();
-        // this.play();
         this.downloadScheduleMusic(this.playlists);
 
         let second = 1000;
@@ -30,6 +29,8 @@ class MusicPlayer {
             this.downloadScheduleMusic(this.playlists);
         }, minute * 30);
 
+        //===============================================================
+        // 每隔 5 秒检查播放列表，如果在时间段内，进行播放
         setInterval(async () => {
             if (this.currentPlayList != null)
                 return;
@@ -45,6 +46,7 @@ class MusicPlayer {
                 }
             }
         }, 1000 * 5);
+        //===============================================================
 
     }
 
@@ -243,19 +245,9 @@ class MusicPlayer {
         })
     }
 
-    private async updatePlayLists() {
-        // try {
-        let service = new Service();
-        // let result = await service.playSchedule();
-        // if (result.code == CodeSuccess)
-        //     this.playlists = result.data.playlist;
-        // else
-        //     this.playlists = [];
+    async updatePlayLists() {
 
-        // }
-        // finally {
-        //     return this.playlists;
-        // }
+        let service = new Service();
         this.playlists = await service.playlists();
     }
 
@@ -349,7 +341,7 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
 
         this.state = { musics: [], current: 0, title: "", info: "", infos: [], showAllInfos: false };
         this.startTime = Date.now();
-        
+
     }
 
     private parseTime(time: string) {
@@ -374,7 +366,6 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
         this.state.infos[1] = { name: `重启时间` };
         this.state.infos[2] = { name: `已下载音乐` };
 
-        // var eplayer = new EPlayer();
         EPlayer.freeSpace(this.props.player.musicDirectory).then(obj => {
 
             this.state.infos[0].value = `总容量:${Math.floor(obj.total / 1024)}M 剩余:${Math.floor(obj.free / 1024)}M`;
@@ -432,15 +423,34 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
 
         }, 1000 * 1);
 
-        var networkState = navigator.connection.type;
-        while (networkState == Connection.NONE) {
-            let timeid = setTimeout(() => {
+        // var networkState = navigator.connection.type;
+        // while (networkState == Connection.NONE) {
+        //     let timeid = setTimeout(() => {
+        //         EPlayer.setWifiFromUsb(
+        //             (isSuccess) => {
+        //                 if (isSuccess) {
+        //                     this.props.player.updatePlayLists();
+        //                 }
+        //             }
+        //         );
+        //         clearTimeout(timeid);
 
-                EPlayer.setWifiFromUsb();
-                clearTimeout(timeid);
+        //     }, 1000 * 15);
+        // }
+    }
 
-            }, 2000);
+    toggleInfo() {
+        this.state.showAllInfos = !this.state.showAllInfos;
+        if (this.state.showAllInfos) {
+            window.resolveLocalFileSystemURL(this.props.player.musicDirectory, (entry: DirectoryEntry) => {
+                let reader = entry.createReader();
+                reader.readEntries((entires) => {
+                    this.state.infos[2].value = `${entires.length}首`;
+                    this.setState(this.state);
+                })
+            })
         }
+        this.setState(this.state);
     }
 
 
@@ -453,7 +463,9 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
         return [
             <div key="title" className="title"
                 onClick={() => {
-                    EPlayer.reboot();
+                    var b = confirm("测试：点击确认按钮重启");
+                    if (b)
+                        EPlayer.reboot();
                 }}>
                 {title}
             </div>,
@@ -474,8 +486,7 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
             </div>,
             <div key="infos" className="infos"
                 onClick={() => {
-                    this.state.showAllInfos = !this.state.showAllInfos;
-                    this.setState(this.state);
+                    this.toggleInfo();
                 }}>
                 {showAllInfos ? infos.map((o, i) =>
                     <div className="item" key={i}>
@@ -558,10 +569,10 @@ class EPlayer {
             )
         })
     }
-    static setWifiFromUsb() {
+    static setWifiFromUsb(callback: (isSuccess: boolean) => void) {
         cordova.exec(
-            () => {
-
+            (isSuccess) => {
+                callback(isSuccess);
             },
             () => {
 
