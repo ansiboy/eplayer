@@ -25,6 +25,13 @@
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </receiver>
+    <receiver android:name=".USBDiskReceiver">
+      <intent-filter android:priority="1000" >
+        <action android:name="android.intent.action.MEDIA_MOUNTED" />
+        <action android:name="android.intent.action.MEDIA_UNMOUNTED" />
+        <data android:scheme="file" />
+      </intent-filter>
+    </receiver>
   </application>
   <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="24"/>
 </manifest>

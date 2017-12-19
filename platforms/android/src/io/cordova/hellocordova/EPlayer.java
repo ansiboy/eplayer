@@ -84,7 +84,7 @@ public class EPlayer extends CordovaPlugin {
     }
 
     public static void playStartSound(Context context){
-        playSound(SOUND_START,context);
+        playSound(SOUND_SUCCESS,context);
     }
 
     private void reboot() {
@@ -106,7 +106,7 @@ public class EPlayer extends CordovaPlugin {
         callbackContext.success(obj);
     }
 
-    private static int SOUND_START = 1;
+    private static int SOUND_SUCCESS = 1;
     private static int SOUND_NETWORK_ERROR = 2;
     private static int SOUND_CONFIG_ERROR = 3;
 
@@ -126,6 +126,7 @@ public class EPlayer extends CordovaPlugin {
                 playSound(SOUND_NETWORK_ERROR,context);
                 return;
             }
+            playSound(SOUND_SUCCESS,context);
 
         } catch (JSONException e) {
             playSound(SOUND_CONFIG_ERROR,context);
@@ -229,7 +230,7 @@ public class EPlayer extends CordovaPlugin {
 
     private static void playSound(int code,Context context) {
         Uri alert = null;// = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        if (code == SOUND_START) {
+        if (code == SOUND_SUCCESS) {
             alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         } else if (code == SOUND_CONFIG_ERROR) {
             alert = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
