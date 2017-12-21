@@ -10,7 +10,7 @@
   "author": "Apache Cordova Team",
   "license": "Apache-2.0",
   "dependencies": {
-    "cordova-android": "^6.3.0",
+    "cordova-android": "^7.0.0",
     "cordova-hot-code-push-local-dev-addon": "^0.4.2",
     "cordova-hot-code-push-plugin": "^1.5.3",
     "cordova-plugin-crosswalk-webview": "^2.3.0",
