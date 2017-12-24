@@ -1,81 +1,150 @@
+function parseTime(time: string) {
+    let arr = time.split(':');
+    console.assert(arr.length == 3);
+    let hour = Number.parseInt(arr[0]);
+    let minute = Number.parseInt(arr[1]);
+    let second = Number.parseInt(arr[2]);
+
+    let today = new Date(Date.now());
+    let year = today.getFullYear();
+    let month = today.getMonth();
+    let date = today.getDate();
+
+    let d = new Date(year, month, date, hour, minute, second);
+    return d;
+}
+
+function parseDate(dateString: string) {
+    let arr = dateString.split('-');
+    let year = Number.parseInt(arr[0]);
+    let month = Number.parseInt(arr[1]) - 1;
+    let date = Number.parseInt(arr[2]);
+    let d = new Date(year, month, date);
+    return d;
+}
+
+function musicLocalFile(directoryName: string, music: { path: string }): Promise<FileEntry> {
+    let arr = music.path.split('/');
+    let fileName = arr[arr.length - 1];
+    // let directoryName = this._musicDirectory;
+    return new Promise((resolve, reject) => {
+        window.resolveLocalFileSystemURL(directoryName,
+            (entry: Entry) => {
+                if (entry.isFile) {
+                    resolve(null);
+                    return;
+                }
+
+                let reader = (entry as DirectoryEntry).createReader();
+                reader.readEntries(
+                    (entries) => {
+                        for (let child of entries) {
+                            if (child.isFile && child.name == fileName) {
+                                resolve(child as FileEntry);
+                                break;
+                            }
+                        }
+
+                        resolve(null);
+                    },
+                    err => reject(err));
+            },
+            err => reject(err)
+        );
+
+    })
+}
+
+async function playMusicByPath(musicDirectory: string, path: string, finish: () => void): Promise<Media> {
+
+    let file = await musicLocalFile(musicDirectory, { path });
+    let fileExists = file != null;
+
+    let src = file != null ? file.nativeURL : path;
+    // src = music.path;
+    let media = new Media(src,
+        () => {
+
+        },
+        err => {
+            if (file != null) {
+                file.remove(() => { });
+            }
+
+            //=======================================
+            // 延时 2 秒，以防出现死循环
+            setTimeout(() => {
+                finish();
+            }, 1000 * 2);
+            //=======================================
+        },
+        (status) => {
+            if (status == Media.MEDIA_STOPPED) {
+                // media.getCurrentPosition(pos => {
+                //     let duration = media.getDuration();
+                // if (pos <= 0) {
+                media.release();
+                finish();
+                // }
+                // })
+            }
+        });
+
+    media.play();
+
+    return media;
+}
+
 class MusicPlayer {
     private _musicDirectory: string;
-    private playlists = new Array<PlayList>();
 
-    currentPlayList: PlayList;
-    currentMusicIndex: number = -1;
-    currentMusic: Media;
+
+    private _currentPlayList: PlayList;
+    private _currentMusicIndex: number = -1;
+    private _currentMusic: Media;
 
     constructor(musicDirectory: string) {
-
         this._musicDirectory = musicDirectory;
-        console.assert(this._musicDirectory != null);
-
-        this.start();
     }
 
     get musicDirectory() {
         return this._musicDirectory;
     }
 
-    private async start() {
-        await this.updatePlayLists();
-        this.downloadScheduleMusic(this.playlists);
-
-        let second = 1000;
-        let minute = second * 60;
-        setInterval(async () => {
-            await this.updatePlayLists();
-            this.downloadScheduleMusic(this.playlists);
-        }, minute * 30);
-
-        //===============================================================
-        // 每隔 5 秒检查播放列表，如果在时间段内，进行播放
-        setInterval(async () => {
-            if (this.currentPlayList != null)
-                return;
-
-            let lists = this.playlists;
-            for (let list of lists) {
-                let online_time = this.parseTime(list.online_time);
-                let offline_time = this.parseTime(list.offline_time);
-                let now = new Date(Date.now());
-                if (now >= online_time && now < offline_time) {
-                    this.playList(list);
-                    break;
-                }
-            }
-        }, 1000 * 5);
-        //===============================================================
-
-        document.addEventListener("online", () => {
-            this.updatePlayLists();
-
-        }, false);
-
+    get currentMusic() {
+        return this._currentMusic;
     }
 
-    private parseTime(time: string) {
-        let arr = time.split(':');
-        console.assert(arr.length == 3);
-        let hour = Number.parseInt(arr[0]);
-        let minute = Number.parseInt(arr[1]);
-        let second = Number.parseInt(arr[2]);
-
-        let today = new Date(Date.now());
-        let year = today.getFullYear();
-        let month = today.getMonth();
-        let date = today.getDate();
-
-        let d = new Date(year, month, date, hour, minute, second);
-        return d;
+    get currentMusicIndex() {
+        return this._currentMusicIndex;
     }
 
-    private playList(list: PlayList) {
-        this.currentPlayList = list;
+    get playList() {
+        return this._currentPlayList;
+    }
+    set playList(playList: PlayList) {
+        console.assert(playList != null);
+        if (this._currentPlayList != null && this._currentPlayList.plid == playList.plid)
+            return;
+
+        this._currentPlayList = playList;
+        this.play();
+    }
+
+    play() {
+        if (this.currentMusic != null) {
+            this.currentMusic.play();
+        }
+        else if (this._currentPlayList != null) {
+            this.playByList(this._currentPlayList);
+        }
+    }
+
+    private playByList(list: PlayList) {
+        this._currentPlayList = list;
         let musics = list.music_list || [];
         let finish = () => {
-            this.currentPlayList = null;
+            this._currentPlayList = null;
         }
         //========================================================
         // 如果没有音乐，延时 60 秒，避免死循环
@@ -85,16 +154,22 @@ class MusicPlayer {
         }
         //========================================================
 
-        let offline_time = this.parseTime(list.offline_time);
-        let playMusic = (num: number) => {
-            this.currentMusicIndex = num;
-            this.playMusic(musics[num], () => {
+        let offline_time = parseTime(list.offline_time);
+        let playMusic = async (num: number) => {
+            this._currentMusicIndex = num;
+            playMusicByPath(this._musicDirectory, musics[num].path, () => {
                 if (offline_time <= new Date(Date.now())) {
                     finish();
                     return;
                 }
                 let next = nextMusic(num);
+
+                this._currentMusic = null;
+
                 playMusic(next);
+
+            }).then(media => {
+                this._currentMusic = media;
             });
         }
 
@@ -128,209 +203,98 @@ class MusicPlayer {
         return value;
     }
 
-    private async playMusic(music: MusicItem, finish: () => void) {
 
-        let file = await this.musicLocalFile(music);
-        let fileExists = file != null;
+    // private clear() {
+    //     window.resolveLocalFileSystemURL(this._musicDirectory,
+    //         (entry: DirectoryEntry) => {
+    //             let reader = entry.createReader();
+    //             reader.readEntries((entries) => {
+    //                 for (let entry of entries)
+    //                     entry.remove(
+    //                         () => {
+    //                             console.log(`remove sucess, fileName: ${entry.name}`)
+    //                         },
+    //                         () => {
+    //                             console.log(`remove fail, fileName: ${entry.name}`)
+    //                         }
+    //                     );
+    //             });
+    //         }
+    //     );
+    // }
 
-        let src = file != null ? file.nativeURL : music.path;
-        // src = music.path;
-        let media = new Media(src,
-            () => {
-
-            },
-            err => {
-                if (file != null) {
-                    file.remove(() => { });
-                }
-
-                //=======================================
-                // 延时 2 秒，以防出现死循环
-                setTimeout(() => {
-                    finish();
-                }, 1000 * 2);
-                //=======================================
-            },
-            (status) => {
-                if (status == Media.MEDIA_STOPPED) {
-                    this.currentMusic = null;
-                    media.release();
-                    finish();
-                }
-            });
-
-        this.currentMusic = media;
-        media.play();
-
-    }
-
-    private musicLocalPath(music: MusicItem) {
-        let arr = music.path.split('/');
-        let fileName = arr[arr.length - 1];
-        let filePath = this._musicDirectory + fileName;
-        return filePath;
-    }
-
-    private musicLocalFile(music: MusicItem): Promise<FileEntry> {
-        let arr = music.path.split('/');
-        let fileName = arr[arr.length - 1];
-        let directoryName = this._musicDirectory;
-        return new Promise((resolve, reject) => {
-            window.resolveLocalFileSystemURL(directoryName,
-                (entry: Entry) => {
-                    if (entry.isFile) {
-                        resolve(null);
-                        return;
-                    }
-
-                    let reader = (entry as DirectoryEntry).createReader();
-                    reader.readEntries(
-                        (entries) => {
-                            for (let child of entries) {
-                                if (child.isFile && child.name == fileName) {
-                                    resolve(child as FileEntry);
-                                    break;
-                                }
-                            }
-
-                            resolve(null);
-                        },
-                        err => reject(err));
-                },
-                err => reject(err)
-            );
-
-        })
-    }
-
-    private downloadFile(url: string, filePath: string): Promise<Entry> {
-        var fileTransfer = new FileTransfer();
-        return new Promise((resolve, reject) => {
-            fileTransfer.download(url, filePath,
-                (entry) => {
-                    resolve(entry);
-                    console.log(`download success,path:${filePath} url:${url}`);
-                },
-                (err) => {
-                    debugger;
-                    console.warn(`download success,path:${filePath} url:${url}`)
-                    reject(err);
-                }
-            );
-        })
-    }
-
-    private childFile(directoryName: string, fileName: string): Promise<FileEntry> {
-        return new Promise((resolve, reject) => {
-
-            window.resolveLocalFileSystemURL(directoryName,
-                (entry: Entry) => {
-                    if (entry.isFile) {
-                        resolve(null);
-                        return;
-                    }
-
-                    let reader = (entry as DirectoryEntry).createReader();
-                    reader.readEntries(
-                        (entries) => {
-                            for (let child of entries) {
-                                if (child.isFile && child.name == child.name) {
-                                    resolve(child as FileEntry);
-                                    break;
-                                }
-                            }
-
-                            resolve(null);
-                        },
-                        err => reject(err));
-                },
-                err => reject(err)
-            );
-
-        })
-    }
-
-    async updatePlayLists() {
-
-        let service = new Service();
-        this.playlists = await service.playlists();
-    }
-
-    private clear() {
-        window.resolveLocalFileSystemURL(this._musicDirectory,
-            (entry: DirectoryEntry) => {
-                let reader = entry.createReader();
-                reader.readEntries((entries) => {
-                    for (let entry of entries)
-                        entry.remove(
-                            () => {
-                                console.log(`remove sucess, fileName: ${entry.name}`)
-                            },
-                            () => {
-                                console.log(`remove fail, fileName: ${entry.name}`)
-                            }
-                        );
-                });
-            }
-        );
-    }
-
-    private async downloadScheduleMusic(playlists: PlayList[]) {
-        // Check Disk
-
-        let downloadMusic = (musics: MusicItem[], index): Promise<any> => {
-            if (index > musics.length - 1)
-                return Promise.resolve();
-
-            let music = musics[index];
-            console.log(`download music ${index}`);
-
-            return this.musicLocalFile(music)
-                .then(musicFile => {
-                    if (musicFile) {
-                        console.log(`file exists, path ${musicFile.nativeURL}`);
-                        return Promise.resolve(musicFile);
-                    }
-
-                    let musicPath = this.musicLocalPath(music);
-                    return this.downloadFile(music.path, musicPath);
-                })
-                .catch(() => {
-                    return Promise.resolve<FileEntry>(null);
-                })
-                .then(() => {
-                    return downloadMusic(musics, index + 1);
-                });
+    pause() {
+        if (this.currentMusic != null) {
+            this.currentMusic.pause();
         }
+    }
+}
 
-        let downloadList = (playlists: PlayList[], index) => {
-            if (index > playlists.length - 1)
+class EpidosePlayer {
+
+    private episodes = new Array<Episode>();
+    private musicPlayer: MusicPlayer;
+
+    constructor(musicPlayer: MusicPlayer) {
+        this.musicPlayer = musicPlayer;
+        this.start();
+    }
+
+    async start() {
+        let service = new Service();
+        this.episodes = await service.episode();
+        setInterval(async () => {
+            this.episodes = await service.episode();
+        }, 1000 * 60 * 30);
+
+        let episodes = new Array<Episode>();
+        let timeIntervalId = setInterval(() => {
+
+            if (episodes.length > 0) // 正在插播中
                 return;
 
-            console.log(`download list ${index}`);
-            downloadMusic(playlists[index].music_list, 0)
-                .then(() => downloadList(playlists, index + 1))
-                .catch(() => downloadList(playlists, index + 1));
+            // 需要播放的插播
+            episodes = this.currentEpisodes();
+            if (episodes.length > 0) {
+
+                this.musicPlayer.pause();
+                let playEpisode = (index: number) => {
+                    if (index > episodes.length - 1) {
+                        this.musicPlayer.play();
+                        episodes = [];
+                        return;
+                    }
+
+                    playMusicByPath(this.musicPlayer.musicDirectory, episodes[index].path, () => {
+                        playEpisode(index + 1);
+                    });
+                }
+                playEpisode(0);
+            }
+
+
+        }, 1000 * 5);
+    }
+
+    currentEpisodes() {
+        let items = new Array<Episode>();
+        for (let i = 0; i < this.episodes.length; i++) {
+            let episode = this.episodes[i];
+            let start_day = parseDate(episode.start_day);
+            let end_day = parseDate(episode.end_day);
+            let now = new Date(Date.now());
+            let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            if (today >= start_day && today < end_day) {
+                for (let timeString of episode.i_time) {
+                    let time = parseTime(timeString);
+                    if (time.getHours() == now.getHours() && time.getMinutes() == now.getMinutes()) {
+                        items.push(episode);
+                    }
+                }
+            }
         }
 
-        downloadList(playlists, 0);
-
-        // for (let playlist of playlists) {
-        //     let musics = playlist.music_list;
-        //     for (let music of musics) {
-        //         let musicFile = await this.musicLocalFile(music);
-        //         if (musicFile == null) {
-        //             try {
-        //                 let musicPath = this.musicLocalPath(music);
-        //                 console.log(`to download ${musicPath}`)
-        //                 this.downloadFile(music.path, musicPath);
-        //             }
-        //             catch (err) {
-        //                 debugger;
-        //             }
-        //         }
-        //     }
-        // }
+        return items;
     }
 }
 
@@ -379,8 +343,8 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
 
         setInterval(() => {
             let musics = new Array<MusicItem>();
-            if (this.props.player.currentPlayList != null) {
-                musics = this.props.player.currentPlayList.music_list || [];
+            if (this.props.player.playList != null) {
+                musics = this.props.player.playList.music_list || [];
             }
 
             this.state.musics = musics;
@@ -415,8 +379,8 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
             this.state.info = `系统已经运行${days}天${hours}小时${minutes}分${seconds}秒`;
             //==========================================================
 
-            //==========================================================
 
+            //==========================================================
             this.state.infos[1].value = `${this.rebootDurationDays - days}天后${this.rebootHour}点重启`;
             if (days >= this.rebootDurationDays && now.getHours() == this.rebootHour) {
                 EPlayer.reboot();
@@ -493,8 +457,115 @@ class MusicPage extends React.Component<{ player: MusicPlayer },
     }
 }
 
+interface MusicFile {
+    path: string
+}
+
+class MusicFileManager {
+
+    private playlists: PlayList[];
+    private musicDirectory: string;
+    private episodes: Episode[];
+
+    constructor(musicDirectory: string) {
+        this.musicDirectory = musicDirectory;
+        this.playlists = new Array<PlayList>();
+    }
+
+    async start() {
+        await this.updateMusicList();
+        let music_files: MusicFile[][] = this.playlists.map(o => o.music_list);
+        this.downloadMusicFiles(music_files);
+        // this.downloadMusicFiles([this.episodes]);
+
+        let second = 1000;
+        let minute = second * 60;
+        setInterval(async () => {
+            await this.updateMusicList();
+            this.downloadMusicFiles(music_files);
+            this.downloadMusicFiles([this.episodes]);
+        }, minute * 30);
+    }
+
+    async updateMusicList() {
+        let service = new Service();
+        this.playlists = await service.playlists();
+        this.episodes = await service.episode();
+    }
+
+
+    private async downloadMusicFiles(playlists: MusicFile[][]) {
+        // Check Disk
+
+        let downloadMusic = (musics: { path: string }[], index): Promise<any> => {
+            if (index > musics.length - 1)
+                return Promise.resolve();
+
+            let music = musics[index];
+            console.log(`download music ${index}`);
+
+            return musicLocalFile(this.musicDirectory, music)
+                .then(musicFile => {
+                    if (musicFile) {
+                        console.log(`file exists, path ${musicFile.nativeURL}`);
+                        return Promise.resolve(musicFile);
+                    }
+
+                    let musicPath = this.musicLocalPath(music);
+                    return this.downloadFile(music.path, musicPath);
+                })
+                .catch(() => {
+                    return Promise.resolve<FileEntry>(null);
+                })
+                .then(() => {
+                    return downloadMusic(musics, index + 1);
+                });
+        }
+
+        let downloadList = (playlists: MusicFile[][], index) => {
+            if (index > playlists.length - 1)
+                return;
+
+            console.log(`download list ${index}`);
+            downloadMusic(playlists[index], 0)
+                .then(() => downloadList(playlists, index + 1))
+                .catch(() => downloadList(playlists, index + 1));
+        }
+
+        downloadList(playlists, 0);
+    }
+
+    private musicLocalPath(music: { path: string }) {
+        let arr = music.path.split('/');
+        let fileName = arr[arr.length - 1];
+        let filePath = this.musicDirectory + fileName;
+        return filePath;
+    }
+
+    private downloadFile(url: string, filePath: string): Promise<Entry> {
+        var fileTransfer = new FileTransfer();
+        return new Promise((resolve, reject) => {
+            fileTransfer.download(url, filePath,
+                (entry) => {
+                    resolve(entry);
+                    console.log(`download success,path:${filePath} url:${url}`);
+                },
+                (err) => {
+                    debugger;
+                    console.warn(`download success,path:${filePath} url:${url}`)
+                    reject(err);
+                }
+            );
+        })
+    }
+
+
+}
 
 class Application {
+
+    private playlists = new Array<PlayList>();
+
     constructor() {
         document.addEventListener('deviceready', () => this.on_deviceready(), false);
     }
@@ -520,12 +591,42 @@ class Application {
         })
 
         let player = new MusicPlayer(musicDirectory.nativeURL);
+        let fileManager = new MusicFileManager(player.musicDirectory);
+        let epidosePlayer = new EpidosePlayer(player);
+
         let appElement = document.getElementsByClassName('app')[0];
         ReactDOM.render(<MusicPage player={player} />, appElement);
+
+
+        await this.updatePlayLists();
+        //===============================================================
+        // 每隔 5 秒检查播放列表，如果在时间段内，进行播放
+        let currentPlayList: PlayList;
+        setInterval(async () => {
+            // if (this.currentPlayList != null)
+            //     return;
+            if (currentPlayList == null) {
+                let lists = this.playlists;
+                for (let list of lists) {
+                    let online_time = parseTime(list.online_time);
+                    let offline_time = parseTime(list.offline_time);
+                    let now = new Date(Date.now());
+                    if (now >= online_time && now < offline_time && currentPlayList != list) {
+                        currentPlayList = list;
+                        player.playList = currentPlayList;
+                        // this.playList(list);
+                        break;
+                    }
+                }
+            }
+
+
+        }, 1000 * 5);
     }
 
-    start() {
-
+    async updatePlayLists() {
+        let service = new Service();
+        this.playlists = await service.playlists();
     }
 }
 
@@ -594,7 +695,7 @@ class EPlayer {
 
 
 let app = new Application();
-app.start();
+
 
 
 
