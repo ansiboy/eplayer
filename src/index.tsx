@@ -603,23 +603,20 @@ class Application {
         // 每隔 5 秒检查播放列表，如果在时间段内，进行播放
         let currentPlayList: PlayList;
         setInterval(async () => {
-            // if (this.currentPlayList != null)
-            //     return;
-            if (currentPlayList == null) {
-                let lists = this.playlists;
-                for (let list of lists) {
-                    let online_time = parseTime(list.online_time);
-                    let offline_time = parseTime(list.offline_time);
-                    let now = new Date(Date.now());
-                    if (now >= online_time && now < offline_time && currentPlayList != list) {
-                        currentPlayList = list;
-                        player.playList = currentPlayList;
-                        // this.playList(list);
-                        break;
-                    }
+            if (currentPlayList != null)
+                return;
+
+            let lists = this.playlists;
+            for (let list of lists) {
+                let online_time = parseTime(list.online_time);
+                let offline_time = parseTime(list.offline_time);
+                let now = new Date(Date.now());
+                if (now >= online_time && now < offline_time && currentPlayList != list) {
+                    currentPlayList = list;
+                    player.playList = currentPlayList;
+                    break;
                 }
             }
-
 
         }, 1000 * 5);
     }
