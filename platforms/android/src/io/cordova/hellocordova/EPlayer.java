@@ -483,6 +483,12 @@ public class EPlayer extends CordovaPlugin {
         System.exit(0);
     }
 
+    public static void restart(Activity context) {
+        ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).set(AlarmManager.RTC, System.currentTimeMillis() + 100,
+                PendingIntent.getActivity(context, 123456, new Intent(context, MainActivity.class), 0));
+        System.exit(0);
+    }
+
     public static void restartAPP(Context context, long Delayed) {
         Intent intent1 = new Intent(context, killSelfService.class);
         intent1.putExtra("PackageName", context.getPackageName());
