@@ -171,7 +171,8 @@ class EPlayer {
         }, this.serviceName, 'setVolume', [value]);
     }
     static restart() {
-        cordova.exec(() => { }, () => { }, this.serviceName, 'restart');
+        location.reload();
+        // cordova.exec(() => { }, () => { }, this.serviceName, 'restart');
     }
 }
 EPlayer.serviceName = "EPlayer";
