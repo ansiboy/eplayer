@@ -10,7 +10,6 @@ import android.util.Log;
 public class USBDiskReceiver extends BroadcastReceiver {
     public SharedPreferences cacheSp;
 
-    @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         String path = intent.getData().getPath();

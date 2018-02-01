@@ -19,7 +19,7 @@
  *
 */
 
-/*
+/* 
  * getFileMetadata
  *
  * IN:
@@ -33,27 +33,26 @@
  *   - size
  *  fail - FileError code
  */
-/* eslint-disable no-undef */
-var resolve = cordova.require('cordova-plugin-file.resolveLocalFileSystemURIProxy');
-var requestAnimationFrame = cordova.require('cordova-plugin-file.bb10RequestAnimationFrame');
-/* eslint-enable no-undef */
+
+var resolve = cordova.require('cordova-plugin-file.resolveLocalFileSystemURIProxy'),
+    requestAnimationFrame = cordova.require('cordova-plugin-file.bb10RequestAnimationFrame');
 
 module.exports = function (success, fail, args) {
-    var uri = args[0];
-    var onSuccess = function (entry) {
-        if (typeof (success) === 'function') {
-            success(entry);
-        }
-    };
-    var onFail = function (error) {
-        if (typeof (fail) === 'function') {
-            if (error.code) {
-                fail(error.code);
-            } else {
-                fail(error);
+    var uri = args[0],
+        onSuccess = function (entry) {
+            if (typeof(success) === 'function') {
+                success(entry);
             }
-        }
-    };
+        },
+        onFail = function (error) {
+            if (typeof(fail) === 'function') {
+                if (error.code) {
+                    fail(error.code);
+                } else {
+                    fail(error);
+                }
+            }
+        };
     resolve(function (entry) {
         requestAnimationFrame(function () {
             if (entry.nativeEntry.file) {

@@ -27,6 +27,7 @@ body {
     width: 100%;
     margin: 0px;
     padding: 0px;
+    background-color: black;
 }
 
 
@@ -90,4 +91,10 @@ body {
 
 .music-name.active {
     background-color: rgb(165, 7, 177);
+}
+
+.downloading {
+    padding-top: 40px;
+    color: white;
+    text-align: center;
 }

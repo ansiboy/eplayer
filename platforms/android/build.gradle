@@ -21,10 +21,8 @@ apply plugin: 'com.android.application'
 
 buildscript {
     repositories {
+        mavenCentral()
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
     }
 
     // Switch the Android Gradle plugin version requirement depending on the
@@ -39,10 +37,8 @@ buildscript {
 // Allow plugins to declare Maven dependencies via build-extras.gradle.
 allprojects {
     repositories {
+        mavenCentral();
         jcenter()
-        maven {
-            url "https://maven.google.com"
-        }
     }
 }
 
@@ -93,8 +89,8 @@ ext {
 
 // PLUGIN GRADLE EXTENSIONS START
 apply from: "cordova-hot-code-push-local-dev-addon/hellocordova-chcp-localdev.gradle"
-apply from: "cordova-hot-code-push-plugin/hellocordova-chcp.gradle"
 apply from: "cordova-plugin-crosswalk-webview/hellocordova-xwalk.gradle"
+apply from: "cordova-hot-code-push-plugin/hellocordova-chcp.gradle"
 // PLUGIN GRADLE EXTENSIONS END
 
 def hasBuildExtras = file('build-extras.gradle').exists()

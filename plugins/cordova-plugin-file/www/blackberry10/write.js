@@ -19,9 +19,9 @@
  *
 */
 
-/*
+/* 
  * write
- *
+ * 
  * IN:
  *  args
  *   0 - URL of file to write
@@ -32,36 +32,35 @@
  *  success - bytes written
  *  fail - FileError
  */
-/* eslint-disable no-undef */
-var resolve = cordova.require('cordova-plugin-file.resolveLocalFileSystemURIProxy');
-var requestAnimationFrame = cordova.require('cordova-plugin-file.bb10RequestAnimationFrame');
-/* eslint-enable no-undef */
+
+var resolve = cordova.require('cordova-plugin-file.resolveLocalFileSystemURIProxy'),
+    requestAnimationFrame = cordova.require('cordova-plugin-file.bb10RequestAnimationFrame');
 
 module.exports = function (success, fail, args) {
-    var uri = args[0];
-    var data = args[1];
-    var offset = args[2];
-    // isBinary = args[3],
-    var onSuccess = function (data) {
-        if (typeof success === 'function') {
-            success(data.loaded);
-        }
-    };
-    var onFail = function (error) {
-        if (typeof fail === 'function') {
-            if (error && error.code) {
-                fail(error.code);
-            } else if (error && error.target && error.target.code) {
-                fail(error.target.code);
-            } else {
-                fail(error);
+    var uri = args[0],
+        data = args[1],
+        offset = args[2],
+        //isBinary = args[3],
+        onSuccess = function (data) {
+            if (typeof success === 'function') {
+                success(data.loaded);
             }
-        }
-    };
+        },
+        onFail = function (error) {
+            if (typeof fail === 'function') {
+                if (error && error.code) {
+                    fail(error.code);
+                } else if (error && error.target && error.target.code) {
+                    fail(error.target.code);
+                } else {
+                    fail(error);
+                }
+            }
+        };
     resolve(function (fs) {
         requestAnimationFrame(function () {
             fs.nativeEntry.createWriter(function (writer) {
-                var blob = new Blob([data]); // eslint-disable-line no-undef
+                var blob = new Blob([data]);
                 if (offset) {
                     writer.seek(offset);
                 }
