@@ -113,4 +113,5 @@ define(["require", "exports", "common", "musicPlayer", "epidosePlayer", "musicFi
         }
     }
     let app = new Application();
+    //HELLO WORLD
 });

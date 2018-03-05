@@ -38,6 +38,12 @@
   <allow-intent href="mailto:*"/>
   <allow-intent href="geo:*"/>
   <allow-intent href="market:*"/>
+  <chcp>
+    <auto-download enabled="false"/>
+    <auto-install enabled="false"/>
+    <config-file url="http://192.168.1.19:8080/eplayer/chcp.json"/>
+    <local-development enabled="true"/>
+  </chcp>
   <preference name="loglevel" value="DEBUG"/>
   <preference name="webView" value="org.crosswalk.engine.XWalkWebViewEngine"/>
   <preference name="xwalkVersion" value="23+"/>
@@ -47,8 +53,4 @@
   <preference name="xwalkMultipleApk" value="true"/>
   <preference name="android-minSdkVersion" value="16"/>
   <preference name="loadUrlTimeoutValue" value="60000"/>
-  <chcp>
-    <local-development enabled="true"/>
-    <config-file url="https://8f864fcb.ngrok.io/chcp.json"/>
-  </chcp>
 </widget>

@@ -33,5 +33,10 @@
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    <chcp>
+        <auto-download enabled="false" />
+        <auto-install enabled="false" />
+        <config-file url="http://192.168.1.19:8080/eplayer/chcp.json" />
+    </chcp>
     <preference name="loadUrlTimeoutValue" value="60000" />
 </widget>

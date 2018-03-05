@@ -257,6 +257,14 @@ module.exports = [
         "clobbers": [
             "window.Media"
         ]
+    },
+    {
+        "file": "plugins/cordova-hot-code-push-local-dev-addon/www/chcpLocalDev.js",
+        "id": "cordova-hot-code-push-local-dev-addon.chcpLocalDev",
+        "pluginId": "cordova-hot-code-push-local-dev-addon",
+        "clobbers": [
+            "chcpLocalDev"
+        ]
     }
 ];
 module.exports.metadata = 
@@ -267,7 +275,8 @@ module.exports.metadata =
     "cordova-hot-code-push-plugin": "1.5.3",
     "cordova-plugin-file": "4.3.3",
     "cordova-plugin-file-transfer": "1.7.1",
-    "cordova-plugin-media": "3.0.1"
+    "cordova-plugin-media": "3.0.1",
+    "cordova-hot-code-push-local-dev-addon": "0.4.2"
 }
 // BOTTOM OF METADATA
 });

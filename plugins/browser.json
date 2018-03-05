@@ -24,6 +24,9 @@
         },
         "cordova-plugin-media": {
             "PACKAGE_NAME": "io.cordova.hellocordova"
+        },
+        "cordova-hot-code-push-local-dev-addon": {
+            "PACKAGE_NAME": "io.cordova.hellocordova"
         }
     },
     "dependent_plugins": {}
