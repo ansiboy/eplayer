@@ -67,7 +67,7 @@ define(["require", "exports", "common", "musicPlayer"], function (require, expor
                     this.episodes = episodes;
                     this.playEpisode(episodes, 0);
                     //========================================================
-                }, 1000 * 5);
+                }, 1000 * 60);
                 InstantEpisode.playStart.add(() => {
                     this.pause();
                 });
@@ -77,13 +77,13 @@ define(["require", "exports", "common", "musicPlayer"], function (require, expor
             });
         }
         static currentEpisodes() {
+            let now = new Date(Date.now());
             let items = new Array();
             let episodes = PlayLists.episodes;
             for (let i = 0; i < episodes.length; i++) {
                 let episode = episodes[i];
                 let start_day = common_1.parseDate(episode.start_day);
                 let end_day = common_1.parseDate(episode.end_day);
-                let now = new Date(Date.now());
                 let today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 if (today >= start_day && today < end_day) {
                     for (let timeString of episode.i_time) {
