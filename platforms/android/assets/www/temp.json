@@ -1,0 +1,122 @@
+[
+    {
+        "voice_id": "43",
+        "name": "开店前30分钟",
+        "path": "http://file.echomelody.com/voice/20180302/4a79b676c5a6604612347c2b7791d335.mp3",
+        "i_time": [
+            "10:20:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "44",
+        "name": "开店前15分钟",
+        "path": "http://file.echomelody.com/voice/20180302/a78a3c1a0af3dda8319028fc186462bd.mp3",
+        "i_time": [
+            "10:25:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "45",
+        "name": "开店前5分钟",
+        "path": "http://file.echomelody.com/voice/20180302/b2f8cee2e71c3228c55eef7638a680bd.mp3",
+        "i_time": [
+            "10:30:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "46",
+        "name": "开店前1分钟",
+        "path": "http://file.echomelody.com/voice/20180302/f0419932c8f3ddf9e1fde3e5b70438ac.mp3",
+        "i_time": [
+            "10:35:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "47",
+        "name": "开店",
+        "path": "http://file.echomelody.com/voice/20180302/1d852967a931c17e3c6c11670de08825.mp3",
+        "i_time": [
+            "10:36:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "48",
+        "name": "广场服务介绍",
+        "path": "http://file.echomelody.com/voice/20180302/e1e8e4a12479798625e0a9c85bc8900d.mp3",
+        "i_time": [
+            "10:30:00",
+            "12:30:00",
+            "14:30:00",
+            "16:30:00",
+            "18:30:00",
+            "20:30:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "50",
+        "name": "广场安全提示",
+        "path": "http://file.echomelody.com/voice/20180302/cf7c8e0919281c1db98f0fbed8687b52.mp3",
+        "i_time": [
+            "11:00:00",
+            "13:00:00",
+            "15:00:00",
+            "17:00:00",
+            "19:00:00",
+            "21:00:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "51",
+        "name": "闭店前15分钟",
+        "path": "http://file.echomelody.com/voice/20180302/6082dfd16eedd791d18df83c26cb40af.mp3",
+        "i_time": [
+            "21:45:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "52",
+        "name": "闭店前5分钟",
+        "path": "http://file.echomelody.com/voice/20180302/9f431ddb0b59e4caaa68e881ff9766ed.mp3",
+        "i_time": [
+            "21:55:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "54",
+        "name": "闭店加回家",
+        "path": "http://file.echomelody.com/voice/20180302/eabb7b8c8c202c5da3581d724be28758.mp3",
+        "i_time": [
+            "22:00:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    },
+    {
+        "voice_id": "55",
+        "name": "开店前40分钟",
+        "path": "http://file.echomelody.com/voice/20180302/556f6ba1accfa9c12cf8e78b80b96a1f.mp3",
+        "i_time": [
+            "09:20:00"
+        ],
+        "start_day": "2018-03-01",
+        "end_day": "2020-03-31"
+    }
+]
